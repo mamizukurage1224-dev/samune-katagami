@@ -125,6 +125,7 @@ h3{margin:0;font:900 15px/1.3 var(--f-body)}
 .cand:hover .cand-frame{outline:2px solid var(--ink-soft)}
 .cand[aria-checked="true"] .cand-frame{outline:3px solid var(--accent);outline-offset:2px}
 .cand:focus-visible{outline:none}
+.cand:disabled{opacity:.45;cursor:default}
 .cand:focus-visible .cand-frame{outline:3px solid var(--accent);outline-offset:4px}
 .cand-name{font-weight:900;font-size:14px;line-height:1.35;display:block}
 .cand[aria-checked="true"] .cand-name{color:var(--accent)}
@@ -179,6 +180,28 @@ input[type="range"]{width:100%;accent-color:var(--accent)}
 .fallback{display:grid;gap:8px;padding:12px;border:1.5px solid var(--accent);border-radius:6px}
 .fallback img{display:block;width:100%;height:auto;border-radius:3px}
 
+/* 新しく作る・履歴 */
+.tools{display:flex;gap:8px 10px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.tool-note{flex:1 1 15em;min-width:0;display:flex;gap:6px 10px;align-items:center;flex-wrap:wrap;min-height:36px}
+.step-head .btn.quiet{margin-left:auto;align-self:center}
+.cands.hist{grid-template-columns:repeat(auto-fill,minmax(176px,1fr))}
+.cand-frame img{display:block;width:100%;height:100%;border-radius:3px;object-fit:cover}
+.sure{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* 動画から場面を取り込む */
+.vid{display:grid;gap:10px;padding-top:4px}
+.vid video{display:block;width:100%;max-height:min(56vh,440px);background:#05070F;border-radius:4px}
+.vid-row{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:center}
+
+/* 吹き出し・飾り */
+.cands.items{grid-template-columns:repeat(5,minmax(0,1fr));gap:14px 10px}
+.item .cand-frame{aspect-ratio:3/2}
+.item .cand-name{text-align:center}
+.item-edit{display:grid;gap:12px;padding:12px;background:var(--well);border-radius:6px;min-width:0}
+.item-edit .tune-grid,.item-edit .tune-actions{margin-top:0}
+.item-edit .field input[type="text"]{font-weight:700}
+.chip[aria-checked="true"]{background:var(--mark);color:var(--on-mark);border-color:var(--on-mark)}
+
 @media (max-width: 1020px){
   .cols{grid-template-columns:minmax(0,1fr)}
   .finish{position:static;max-height:none;overflow:visible}
@@ -186,7 +209,8 @@ input[type="range"]{width:100%;accent-color:var(--accent)}
 @media (max-width: 640px){
   body{font-size:14.5px}
   .mats,.row2{grid-template-columns:minmax(0,1fr)}
-  .cands,.cands.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cands,.cands.four,.cands.hist{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cands.items{grid-template-columns:repeat(3,minmax(0,1fr))}
   #propCands{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
   #propCands .cand-name{font-size:12.5px}
   #propCands .cand-note{font-size:11px}
@@ -201,7 +225,23 @@ input[type="range"]{width:100%;accent-color:var(--accent)}
   <header class="mast">
     <div class="mast-title"><span class="frame-mark" aria-hidden="true"></span><h1>サムネ型紙</h1></div>
     <p class="mast-lead">素材と文字を入れたら、並んだ候補から選ぶだけ。配置・フォント・色・文字の大きさは型が決めます。</p>
+    <div class="tools">
+      <button type="button" class="btn" id="newBtn">新しく作る</button>
+      <button type="button" class="btn" id="histBtn" aria-expanded="false" aria-controls="histSheet">履歴</button>
+      <p class="note tool-note"><span id="toolText" role="status"></span><button type="button" class="btn quiet" id="undoBtn" hidden>元に戻す</button></p>
+    </div>
   </header>
+
+  <section class="sheet" id="histSheet" aria-labelledby="h-hist" hidden>
+    <div class="step-head"><span class="num short" aria-hidden="true">履歴</span><h2 id="h-hist">保存したサムネを開く</h2><p class="step-hint">「画像を保存」を押すたびに、ここに残ります。開くと、文字や画像を入れ替えて作り直せます。</p><button type="button" class="btn quiet" id="histClose">閉じる</button></div>
+    <div class="cands hist" id="histCands"></div>
+    <p class="note" id="histEmpty">まだありません。「仕上げて保存」の「画像を保存」を押すと、そのときのサムネがここに並びます。</p>
+    <div class="sure" id="histFoot">
+      <span class="note">新しいものから12個まで、このブラウザに残ります。</span>
+      <button type="button" class="btn quiet" id="histClear">履歴をすべて消す</button>
+      <span class="sure" id="histSure" hidden><span class="note err">履歴をすべて消します。元には戻せません。</span><button type="button" class="btn" id="histClearYes">消す</button><button type="button" class="btn quiet" id="histClearNo">やめる</button></span>
+    </div>
+  </section>
 
   <div class="cols">
     <main class="steps">
@@ -245,13 +285,38 @@ input[type="range"]{width:100%;accent-color:var(--accent)}
               </div>
             </div>
           </div>
+          <div class="mat mat-wide" id="dropVideo">
+            <div class="mat-body">
+              <div class="mat-title">動画から場面を取り込む<span class="tag">切り抜き用</span></div>
+              <p class="mat-hint">動画ファイルを開いて、使いたい瞬間で止めると、その場面を画像として入れられます。</p>
+              <div class="mat-actions">
+                <button type="button" class="btn" id="pickVideo">動画を選ぶ</button>
+                <button type="button" class="btn quiet" id="closeVideo" hidden>動画を閉じる</button>
+                <input type="file" id="fileVideo" accept="video/*,.mkv" hidden>
+              </div>
+              <div class="vid" id="vidBox" hidden>
+                <video id="vid" controls playsinline preload="auto" aria-label="取り込む動画"></video>
+                <div class="vid-row">
+                  <span class="seg-btns" role="group" aria-label="止める位置を動かす"><button type="button" class="btn" data-step="-1">−1秒</button><button type="button" class="btn" data-step="-f">◀ 1コマ</button><button type="button" class="btn" data-step="f">1コマ ▶</button><button type="button" class="btn" data-step="1">＋1秒</button></span>
+                  <span class="mono" id="vidTime">0:00.00</span>
+                </div>
+                <div class="vid-row" role="group" aria-labelledby="capLab">
+                  <span class="lab" id="capLab">この場面を</span>
+                  <button type="button" class="btn" data-cap="bg">背景に入れる</button>
+                  <button type="button" class="btn" data-cap="person">人物に入れる</button>
+                  <button type="button" class="btn" data-cap="extra">追加の画像に入れる</button>
+                </div>
+                <p class="note" id="vidMsg" role="status"></p>
+              </div>
+            </div>
+          </div>
         </div>
-        <p class="note" id="matNote">画像は枠にドラッグしても、コピーして貼り付け（Ctrl+V）しても入ります。画像はこのページの外へ送られません。</p>
+        <p class="note" id="matNote">画像は枠にドラッグしても、コピーして貼り付け（Ctrl+V）しても入ります。画像も動画も、このページの外へは送られません。</p>
 
         <div class="fields">
           <div class="field">
             <label for="mainText">メインの文字<small>12文字くらいまでが読みやすい</small></label>
-            <textarea id="mainText" rows="2" spellcheck="false"></textarea>
+            <textarea id="mainText" rows="2" spellcheck="false" placeholder="例：叫びすぎて喉が終わった"></textarea>
             <p class="note">改行は自動で入ります。自分で改行した位置はそのまま使います。</p>
           </div>
           <div class="field" id="emphField">
@@ -300,6 +365,12 @@ input[type="range"]{width:100%;accent-color:var(--accent)}
           </div>
         </div>
       </section>
+
+      <section class="sheet" aria-labelledby="h-items">
+        <div class="step-head"><span class="num short" aria-hidden="true">任意</span><h2 id="h-items">吹き出し・飾りを足す</h2><p class="step-hint">押すと、仕上がりの画像に乗ります。色や線は、えらんだ雰囲気に合わせて変わります。</p></div>
+        <div class="cands items" id="itemCands"></div>
+        <p class="note" id="itemNote">足したあとは、仕上がりの画像の上でドラッグして動かせます。文字・大きさ・位置は「仕上げて保存」で変えられます。</p>
+      </section>
     </main>
 
     <aside class="sheet finish" aria-labelledby="h-step4">
@@ -310,6 +381,26 @@ input[type="range"]{width:100%;accent-color:var(--accent)}
       </div>
       <div class="stage-note"><span class="mono">1280 × 720 px ・ 16:9</span><span id="dragNote">人物はマウスでドラッグして動かせます。</span></div>
       <p class="save-msg" id="saveMsg" role="status">PNGで保存します。2MBを超えるときはJPGに切り替えます。</p>
+      <div class="item-edit" id="itemBox" hidden>
+        <div class="seg"><span class="lab" id="itemLab">足した飾り</span><div class="chips" id="itemChips" role="radiogroup" aria-labelledby="itemLab"></div></div>
+        <p class="note" id="itemHint">飾りを押して選ぶと、文字・大きさ・向きを変えられます。</p>
+        <div class="fields" id="itemEdit" hidden>
+          <div class="field" id="itemTextField"><label for="itemText">この飾りの文字</label><input type="text" id="itemText" maxlength="30" autocomplete="off"></div>
+          <div class="tune-grid">
+            <label for="iSize">大きさ</label><input type="range" id="iSize" min="40" max="250" value="100">
+            <label for="iRot">回転</label><input type="range" id="iRot" min="-180" max="180" value="0">
+            <label for="iX">左右</label><input type="range" id="iX" min="0" max="100" step="0.5" value="50">
+            <label for="iY">上下</label><input type="range" id="iY" min="0" max="100" step="0.5" value="50">
+          </div>
+          <div class="color-row" id="itemColorRow"><span class="lab" id="itemColorLab">色</span><div class="swatches" id="itemColors" role="radiogroup" aria-labelledby="itemColorLab"></div></div>
+          <div class="tune-actions">
+            <button type="button" class="btn" id="iFlip">左右の向きを反対にする</button>
+            <button type="button" class="btn quiet" id="iDel">この飾りを外す</button>
+          </div>
+          <p class="note">点線の枠は、選んでいる目印です。保存する画像には入りません。</p>
+        </div>
+      </div>
+      <p class="note" id="itemGone" role="status" hidden><span id="itemGoneText"></span> <button type="button" class="btn quiet" id="itemBack">元に戻す</button></p>
       <div class="quick">
         <button type="button" class="btn" id="tFlip" aria-pressed="false">人物を左右反転</button>
         <button type="button" class="btn" id="tBlur" aria-pressed="false" hidden>背景をぼかす</button>
@@ -372,6 +463,9 @@ const $ = (s, r = document) => r.querySelector(s);
 const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
 const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
 const rngOf = seed => { let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+const toBlob = (c, type, q) => new Promise(r => c.toBlob(r, type, q));
+const newId = p => p + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); // 先頭1文字が種類、つづきが作った時刻
+const idTime = id => parseInt(String(id).slice(1).split('-')[0], 36) || 0;
 
 /* ================= 色 ================= */
 const hex2rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
@@ -588,6 +682,7 @@ const S = {
   main: '叫びすぎて\n喉が終わった', emph: new Set(['喉']), sub: 'ホラゲ配信まとめ', label: '30分',
   layout: 'right', theme: 'teiban', color: null, emphColor: null, dim: 0,
   extra: [], sel: 0, textScale: 1, blur: false, deco: false, badge: true, smallP: true,
+  items: [], pick: null, // 吹き出し・飾りと、いま選んでいるもの
 };
 /* 画像は「人物」1枚＋「追加の画像」3枚まで。位置と大きさは画像ごとに持つ */
 const newAdj = () => ({dx: 0, dy: 0, zoom: 1, flip: false}), SPARE = {adj: newAdj()};
@@ -595,7 +690,8 @@ const imgs = () => (S.person ? [S.person] : []).concat(S.extra), multi = () => i
 const target = () => (LAYOUTS[S.layout].multi && multi() ? imgs()[S.sel] : S.person) || SPARE; // いま動かす対象: ならべる型では選んだ画像、ほかの型では人物
 Object.defineProperty(S, 'adj', {get: () => target().adj, set: v => { target().adj = v; }});
 const STORE = 'samune-katagami-v1';
-function saveState() { try { localStorage.setItem(STORE, JSON.stringify({main: S.main, emph: [...S.emph], sub: S.sub, label: S.label, layout: S.layout, theme: S.theme, color: S.color, emphColor: S.emphColor, dim: S.dim})); } catch (e) {} }
+function saveState() { try { localStorage.setItem(STORE, JSON.stringify({main: S.main, emph: [...S.emph], sub: S.sub, label: S.label, layout: S.layout, theme: S.theme, color: S.color, emphColor: S.emphColor, dim: S.dim,
+  blur: S.blur, deco: S.deco, smallP: S.smallP, textScale: S.textScale, items: S.items})); } catch (e) {} }
 function loadState() {
   try {
     const d = JSON.parse(localStorage.getItem(STORE) || 'null'); if (!d || typeof d.main !== 'string') return;
@@ -603,6 +699,9 @@ function loadState() {
     if (LAYOUTS[d.layout]) S.layout = d.layout; if (THEMES.some(t => t.id === d.theme)) S.theme = d.theme;
     const hex = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
     if (hex(d.color)) S.color = d.color; if (hex(d.emphColor)) S.emphColor = d.emphColor; if ([0, 1, 2].includes(d.dim)) S.dim = d.dim;
+    for (const k of ['blur', 'deco', 'smallP']) if (typeof d[k] === 'boolean') S[k] = d[k];
+    if (d.textScale >= .6 && d.textScale <= 1) S.textScale = +d.textScale;
+    S.items = cleanItems(d.items);
   } catch (e) {}
 }
 
@@ -678,6 +777,13 @@ function parseMain() {
   }
   parsed = {text: S.main, groups, keys};
   return parsed;
+}
+/* 吹き出しなど、メイン以外の文字を同じやり方で分ける */
+const textCache = new Map();
+function parseText(text) {
+  let g = textCache.get(text); if (g) return g;
+  g = []; for (const line of String(text).split(/\r?\n/)) { const us = line.trim() ? unitsOf(tokensOf(line.trim())) : []; if (us.length) g.push(us); }
+  if (textCache.size > 80) textCache.clear(); textCache.set(text, g); return g;
 }
 
 /* ================= 素材 ================= */
@@ -909,14 +1015,14 @@ function paint(env, ops) {
 }
 /* 改行位置を決める: 候補を総当たりして、いちばん小さい行がいちばん大きくなる分け方を採る */
 const PARTICLE_SCALE = .78; // 助詞は小さくして、言葉のほうを目立たせる
-const partScale = (env, p) => p.em ? env.T.es : (!p.e && S.smallP) ? PARTICLE_SCALE : 1;
+const partScale = (env, p) => p.em ? env.T.es : (!p.e && S.smallP && !env.plain) ? PARTICLE_SCALE : 1; // env.plain: 吹き出しの中など、飾らずに組む文字
 function partW(env, p) {
   let w = 0; for (const r of runsOf(env.T.font, p.t, env.perChar)) w += r.adv + (env.T.ls || 0) * r.n;
   return w * partScale(env, p);
 }
 function choose(env, groups, box, o) {
   const {T, M} = env;
-  const gi = groups.map(g => g.map(u => { let w = 0, em = false; for (const p of u.parts) { p.em = p.e && S.emph.has(p.key); if (p.em) em = true; w += partW(env, p); } return {u, w, em}; }));
+  const gi = groups.map(g => g.map(u => { let w = 0, em = false; for (const p of u.parts) { p.em = !env.plain && p.e && S.emph.has(p.key); if (p.em) em = true; w += partW(env, p); } return {u, w, em}; }));
   const bounds = []; gi.forEach((g, a) => { for (let b = 1; b < g.length; b++) bounds.push([a, b, g[b].u.soft ? 1 : 0]); });
   let extra = Math.max(0, o.lines - groups.length); if (bounds.length > 26) extra = Math.min(extra, 2);
   const skewX = T.skew ? Math.abs(T.skew) * M.a : 0, pad2 = 2 * (T.padX || 0), gap = T.gap || .18;
@@ -943,7 +1049,7 @@ function choose(env, groups, box, o) {
 function block(env, groups, box, o) {
   const {ctx, T, M} = env; if (!groups.length) return null;
   const tilt = o.noTilt ? 0 : T.tilt, bx = tilt ? {x: box.x + box.w * .02, y: box.y + box.h * .04, w: box.w * .95, h: box.h * .92} : box;
-  const b = choose(env, groups, bx, o), gap = T.gap || .18, mul = (T.sizeMul || 1) * S.textScale;
+  const b = choose(env, groups, bx, o), gap = T.gap || .18, mul = env.plain ? 1 : (T.sizeMul || 1) * S.textScale;
   const sizes = b.sizes.map(s => s * mul);
   let tot = 0; sizes.forEach((s, i) => { tot += s * b.hf[i]; if (i) tot += gap * Math.min(s, sizes[i - 1]); });
   let y = o.valign === 'bottom' ? bx.y + bx.h - tot : o.valign === 'top' ? bx.y : bx.y + (bx.h - tot) / 2;
@@ -1167,6 +1273,139 @@ const LAYOUT_ORDER = ['right', 'left', 'bottom', 'split', 'panel', 'tate', 'stri
 const imgBacked = lay => !!S.bg || (photo() && (lay === 'bottom' || lay === 'split')) || (!!LAYOUTS[lay].multi && imgs().some(P => !P.cutout));
 const layoutNow = id => LAYOUTS[id].multi && !multi() ? 'right' : id; // 画像が1枚なら、ならべる型は使えない
 
+/* ================= 吹き出しと飾り =================
+   場所は「人物が右にいる向き」でおぼえておき、人物が左に来る型では左右を裏返して描く。
+   線と色は、えらんだ雰囲気（文字のフチ・目立たせる色・人物のフチ）から決める */
+const ITEM_MAX = 12;
+const ITEMS = { // at: 顔からのずれ / half: おおよその半分の大きさ（はじめに置く場所を画面の中に収めるのに使う）
+  bubble: {name: '吹き出し', text: 'えっ！？', at: [185, -170], half: [170, 138], flip: true, canFlip: true},
+  shout: {name: 'さけび', text: 'うわあ！', at: [185, -165], half: [196, 138]},
+  box: {name: '名札', text: 'なまえ', at: [0, 300], half: [120, 44]},
+  stamp: {name: '文字スタンプ', text: '！？', at: [-150, -180], half: [120, 84], r: -8, tint: true},
+  arrow: {name: '矢印', at: [235, 165], half: [134, 78], r: 20, flip: true, canFlip: true, tint: true},
+  ring: {name: '丸囲み', at: [0, 0], half: [170, 146], r: -6, tint: true},
+  anger: {name: '怒り', at: [165, -185], half: [84, 84]},
+  sweat: {name: '汗', at: [205, -60], half: [98, 92], canFlip: true},
+  spark: {name: 'キラキラ', at: [-150, -180], half: [112, 112]},
+  heart: {name: 'ハート', at: [180, -160], half: [98, 86], r: 10},
+};
+const ITEM_ORDER = Object.keys(ITEMS);
+const TINTS = [['おまかせ', null], ['赤', '#E3001B'], ['黄', '#FFE600'], ['白', '#FFFFFF'], ['黒', '#16161D']];
+const FACE = {right: [935, 285], left: [935, 285], bottom: [640, 240], split: [875, 290], panel: [925, 290], tate: [830, 290], strips: [640, 280], rows: [640, 170]}; // 型ごとの、顔のおおよその位置
+const mirrored = lay => lay === 'left';
+const placed = (it, lay) => mirrored(lay) ? {x: W - it.x, y: it.y, r: -it.r, flip: !it.flip, s: it.s} : {x: it.x, y: it.y, r: it.r, flip: !!it.flip, s: it.s};
+function cleanItems(list) { // 保存してあったものは、形を確かめてから使う
+  const hex = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : null, num = (v, d, a, b) => { v = +v; return isFinite(v) ? clamp(v, a, b) : d; };
+  return (Array.isArray(list) ? list : []).filter(x => x && ITEMS[x.type]).slice(0, ITEM_MAX).map(x => ({id: typeof x.id === 'string' && x.id ? x.id : newId('i'), type: x.type,
+    x: num(x.x, W / 2, 0, W), y: num(x.y, H / 2, 0, H), s: num(x.s, 1, .4, 2.5), r: num(x.r, 0, -180, 180), flip: !!x.flip, text: String(x.text == null ? '' : x.text).slice(0, 30), color: hex(x.color)}));
+}
+function itemStyle(T) {
+  const hexOk = c => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c), st0 = T.main.st[0] && T.main.st[0][0], fill = lastOf(T.main.fill);
+  const line = hexOk(st0) && lum(st0) < .25 ? st0 : hexOk(fill) && lum(fill) < .4 ? fill : (T.dark || K); // 吹き出しの線と、中の文字の色
+  const sticker = T.outline && hexOk(T.outline[0]) ? T.outline[0] : '#FFFFFF';                               // シール風のフチ
+  let hot = lastOf(T.emph.fill); const [, hs, hl] = hexOk(hot) ? rgb2hsl(hex2rgb(hot)) : [0, 0, 1];         // 矢印・丸囲みの色
+  if (!hexOk(hot) || (hs < .2 && hl > .8)) hot = hexOk(T.chip[0]) && rgb2hsl(hex2rgb(T.chip[0]))[1] > .3 ? T.chip[0] : '#E3001B';
+  return {line, sticker, hot, sh: T.pshadow ? [T.pshadow[0], 20, 0, T.pshadow[3] ? 6 : 0] : ['rgba(0,0,0,.4)', 16, 0, 7]};
+}
+const edgeOf = (D, fill) => contrast(fill, D.sticker) >= 2 ? D.sticker : D.line; // フチは、塗りと見分けがつくほうの色にする
+function stampInk(T, D, tint) {
+  let ink = tint ? emphInk(T, T.main, tint, T.dark || K, T.emph.st) : T.emph;
+  if (!ink.st || !ink.st.length) ink = {fill: ink.fill, st: [[contrast(lastOf(ink.fill), '#FFFFFF') >= 2 ? '#FFFFFF' : D.line, .07]], sh: ['rgba(0,0,0,.4)', 0, .035, .045]}; // フチのない雰囲気でも、写真の上で読めるように
+  return ink;
+}
+function glyphs(env, text, size, ink) { // 1行の文字を、原点をまんなかにして描く。戻り値は幅
+  const {T, M} = env, runs = runsOf(T.font, text, false); let w = 0; for (const g of runs) w += g.adv * size;
+  let x = -w / 2; const y = (M.a - M.d) / 2 * size, ops = [];
+  for (const g of runs) { ops.push({t: g.t, x, dx: g.off * size, y, size, ink}); x += g.adv * size; }
+  paint(env, ops); return w;
+}
+function itemText(env, text, boxes, ink) { // 枠の中に、いちばん大きく入る改行で組む。枠の候補（横長・縦長）のうち、文字が大きくなるほうを使う
+  const groups = parseText(text); if (!groups.length) return;
+  const pe = Object.assign({}, env, {plain: true, perChar: false, info: {sizes: []}, T: {font: env.T.font, es: 1, gap: .14, main: ink, emph: ink}});
+  const opt = bx => ({style: 'uniform', lines: 3, align: 'center', valign: 'center', max: bx.h * .8, noTilt: true});
+  let best = null, top = 0;
+  for (const bx of boxes) { const z = Math.min(...choose(pe, groups, bx, opt(bx)).sizes); if (z > top * 1.03) { top = z; best = bx; } }
+  block(pe, groups, best, opt(best));
+}
+function drawItem(env, D, it, p) { // 戻り値: つかめる範囲の半分の幅と高さ
+  const {ctx, T, M} = env, z = p.s, hot = it.color || D.hot, dark = {fill: D.line, st: [], sh: null}; let hw = 60 * z, hh = 60 * z;
+  ctx.save(); ctx.translate(p.x, p.y); if (p.r) ctx.rotate(p.r * Math.PI / 180); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  const sticker = (path, fill, ew) => { // フチ（影つき）→ 塗り
+    ctx.save(); shadow(env, D.sh); ctx.strokeStyle = edgeOf(D, fill); ctx.lineWidth = ew * 2; path(); ctx.stroke(); ctx.restore();
+    ctx.fillStyle = fill; path(); ctx.fill();
+  };
+  const outlined = (path, fill2) => { // 吹き出し: 線（影つき）→ 白い塗り
+    ctx.save(); shadow(env, D.sh); ctx.strokeStyle = D.line; ctx.lineWidth = Math.max(3, 7 * z) * 2; path(); ctx.stroke(); ctx.restore();
+    ctx.fillStyle = '#FFFFFF'; fill2();
+  };
+  if (it.type === 'bubble') {
+    const a = 158 * z, b = 104 * z, cy = -b * .2; hw = a + 8 * z; hh = b * 1.22 + 8 * z;
+    const body = () => { ctx.beginPath(); ctx.ellipse(0, cy, a, b, 0, 0, Math.PI * 2); };
+    const tail = () => { ctx.moveTo(.8 * a, cy + .44 * b); ctx.quadraticCurveTo(.9 * a, cy + b, .98 * a, cy + 1.42 * b); ctx.quadraticCurveTo(.6 * a, cy + 1.1 * b, .46 * a, cy + .76 * b); ctx.closePath(); };
+    ctx.save(); if (p.flip) ctx.scale(-1, 1);
+    outlined(() => { body(); tail(); }, () => { body(); ctx.fill(); ctx.beginPath(); tail(); ctx.fill(); }); ctx.restore();
+    itemText(env, it.text, [{x: -a * .74, y: cy - b * .64, w: a * 1.48, h: b * 1.28}, {x: -a * .88, y: cy - b * .31, w: a * 1.76, h: b * .62}], dark);
+  } else if (it.type === 'shout') {
+    const a = 178 * z, b = 124 * z, n = 13, rg = rngOf(23), pts = []; hw = a * 1.06 + 8 * z; hh = b * 1.06 + 8 * z;
+    for (let i = 0; i < n * 2; i++) { const an = i / (n * 2) * Math.PI * 2 - Math.PI / 2, k2 = i % 2 ? .71 + rg() * .05 : .92 + rg() * .14; pts.push([Math.cos(an) * a * k2, Math.sin(an) * b * k2]); }
+    ctx.save(); if (p.flip) ctx.scale(-1, 1); ctx.lineJoin = 'miter'; ctx.miterLimit = 4;
+    outlined(() => poly(ctx, pts), () => { poly(ctx, pts); ctx.fill(); }); ctx.restore();
+    itemText(env, it.text, [{x: -a * .53, y: -b * .46, w: a * 1.06, h: b * .92}, {x: -a * .66, y: -b * .22, w: a * 1.32, h: b * .44}], dark);
+  } else if (it.type === 'box') {
+    const fs = 56 * z, t = it.text.trim() || '　'; let w = 0; for (const g of runsOf(T.font, t, false)) w += g.adv * fs;
+    const bw = w + fs * .88, bh = M.h * fs + fs * .4; hw = bw / 2; hh = bh / 2;
+    ctx.save(); shadow(env, ['rgba(0,0,0,.32)', 0, 4, 5], z); ctx.fillStyle = T.chip[0]; ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-hw, -hh, bw, bh, T.chipR ? hh : 9 * z); else ctx.rect(-hw, -hh, bw, bh); ctx.fill(); shadow(env, null);
+    if (T.chipLine) { ctx.strokeStyle = T.chipLine; ctx.lineWidth = 2.5 * z; ctx.stroke(); } ctx.restore();
+    glyphs(env, t, fs, {fill: T.chip[1], st: [], sh: null});
+  } else if (it.type === 'stamp') {
+    const fs = 150 * z, w = glyphs(env, it.text.trim() || '！', fs, stampInk(T, D, it.color)); hw = w / 2 + fs * .1; hh = M.h * fs / 2 + fs * .08;
+  } else if (it.type === 'arrow') {
+    const P = [[-120, -17], [20, -28], [20, -66], [122, 0], [20, 66], [20, 28], [-120, 17]].map(q => [q[0] * z, q[1] * z]); hw = 134 * z; hh = 78 * z;
+    ctx.save(); if (p.flip) ctx.scale(-1, 1); sticker(() => poly(ctx, P), hot, 9 * z); ctx.restore();
+  } else if (it.type === 'ring') {
+    const rx = 150 * z, ry = 126 * z, w = 17 * z, path = () => { ctx.beginPath(); ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2); }; hw = rx + w; hh = ry + w;
+    ctx.save(); shadow(env, D.sh); ctx.strokeStyle = edgeOf(D, hot); ctx.lineWidth = w + 10 * z; path(); ctx.stroke(); ctx.restore();
+    ctx.strokeStyle = hot; ctx.lineWidth = w; path(); ctx.stroke();
+  } else if (it.type === 'anger') {
+    const c = '#FF2A1A'; hw = hh = 84 * z;
+    const path = () => { ctx.beginPath(); for (let i = 0; i < 4; i++) { const an = i * Math.PI / 2, cs = Math.cos(an), sn = Math.sin(an), pt = (x, y) => [(x * cs - y * sn) * z, (x * sn + y * cs) * z];
+      const p0 = pt(15, 64), pc = pt(19, 19), p1 = pt(64, 15); ctx.moveTo(p0[0], p0[1]); ctx.quadraticCurveTo(pc[0], pc[1], p1[0], p1[1]); } };
+    ctx.save(); shadow(env, D.sh); ctx.strokeStyle = edgeOf(D, c); ctx.lineWidth = 32 * z; path(); ctx.stroke(); ctx.restore();
+    ctx.strokeStyle = c; ctx.lineWidth = 18 * z; path(); ctx.stroke();
+  } else if (it.type === 'sweat') {
+    const c = '#62CDFF', drops = [[-46, -40, 38, 3.5], [6, 2, 54, 3.85], [44, 52, 36, 4.2]]; hw = 98 * z; hh = 92 * z; // x, y, 大きさ, とがった先の向き
+    const at = (d, u, v) => { const cs = Math.cos(d[3]), sn = Math.sin(d[3]), h = d[2] * z; return [d[0] * z + (u * cs - v * sn) * h, d[1] * z + (u * sn + v * cs) * h]; };
+    const path = () => { ctx.beginPath(); for (const d of drops) { const t = at(d, 0, -1), c1 = at(d, .66, -.1), c2 = at(d, .64, .66), e = at(d, 0, .66), c3 = at(d, -.64, .66), c4 = at(d, -.66, -.1);
+      ctx.moveTo(t[0], t[1]); ctx.bezierCurveTo(c1[0], c1[1], c2[0], c2[1], e[0], e[1]); ctx.bezierCurveTo(c3[0], c3[1], c4[0], c4[1], t[0], t[1]); ctx.closePath(); } };
+    ctx.save(); if (p.flip) ctx.scale(-1, 1); sticker(path, c, 7 * z);
+    ctx.fillStyle = 'rgba(255,255,255,.82)'; for (const d of drops) { const m = at(d, -.2, .22); ctx.beginPath(); ctx.ellipse(m[0], m[1], d[2] * z * .12, d[2] * z * .2, d[3], 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+  } else if (it.type === 'spark') {
+    const c = '#FFEE5C', stars = [[-12, 12, 86], [70, -64, 38], [-74, -66, 26], [68, 62, 22]]; hw = hh = 112 * z;
+    const path = () => { ctx.beginPath(); for (const [x, y, R] of stars) { const X = x * z, Y = y * z, r = R * z, w = r * .74, q = r * .12;
+      ctx.moveTo(X, Y - r); ctx.quadraticCurveTo(X + q, Y - q, X + w, Y); ctx.quadraticCurveTo(X + q, Y + q, X, Y + r); ctx.quadraticCurveTo(X - q, Y + q, X - w, Y); ctx.quadraticCurveTo(X - q, Y - q, X, Y - r); ctx.closePath(); } };
+    sticker(path, c, 6 * z);
+  } else if (it.type === 'heart') {
+    const c = '#FF3F7A', R = 86 * z; hw = R * 1.14; hh = R;
+    const path = () => { ctx.beginPath(); ctx.moveTo(0, R * .92); ctx.bezierCurveTo(-R * 1.5, R * .02, -R * .82, -R * 1.14, 0, -R * .42); ctx.bezierCurveTo(R * .82, -R * 1.14, R * 1.5, R * .02, 0, R * .92); ctx.closePath(); };
+    sticker(path, c, 8 * z);
+    ctx.fillStyle = 'rgba(255,255,255,.72)'; ctx.beginPath(); ctx.ellipse(-R * .46, -R * .4, R * .14, R * .22, -.6, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore(); return [hw, hh];
+}
+function drawItems(env, lay, sel) {
+  const {ctx} = env, D = itemStyle(env.T), out = [];
+  for (const it of S.items) { const p = placed(it, lay), g = drawItem(env, D, it, p); out.push({id: it.id, x: p.x, y: p.y, r: p.r, hw: g[0], hh: g[1]}); }
+  const g = sel && out.find(o => o.id === sel);
+  if (g) { // 選んでいる飾りの目印（保存する画像には描かない）
+    ctx.save(); ctx.translate(g.x, g.y); ctx.rotate(g.r * Math.PI / 180); ctx.setLineDash([16, 11]);
+    for (const [w, c] of [[7, 'rgba(0,0,0,.55)'], [3.5, '#FFFFFF']]) { ctx.lineWidth = w; ctx.strokeStyle = c; ctx.strokeRect(-g.hw - 10, -g.hh - 10, (g.hw + 10) * 2, (g.hh + 10) * 2); }
+    ctx.restore();
+  }
+  return out;
+}
+
 function draw(canvas, opt = {}) {
   const ctx = canvas.getContext('2d'), k = canvas.width / W;
   ctx.setTransform(k, 0, 0, k, 0, 0); ctx.clearRect(0, 0, W, H); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
@@ -1175,6 +1414,7 @@ function draw(canvas, opt = {}) {
   const env = {ctx, k, T, M: fm(T.font), perChar: !!(T.ls || T.jitter), info: {sizes: []}, focus: [W / 2, H / 2], f: img ? DIM[S.dim] : 1, bare: img && S.dim === 0, img, hits: []};
   ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
   LAYOUTS[lay].draw(env);
+  env.info.items = S.items.length ? drawItems(env, lay, opt.pick) : [];
   if (opt.badge) badge(env);
   ctx.restore();
   if (!env.hits.length && S.person) env.hits.push({i: 0, pts: [[0, 0], [W, 0], [W, H], [0, H]]}); // ドラッグで動かせる範囲
@@ -1316,15 +1556,82 @@ function syncMats() {
   const who = many ? `${S.sel + 1}枚目` : '人物';
   $('#labZoom').textContent = who + 'の大きさ'; $('#labX').textContent = who + 'の左右'; $('#labY').textContent = who + 'の上下';
   $('#tFlip').textContent = many ? `${S.sel + 1}枚目を左右反転` : '人物を左右反転';
-  $('#dragNote').textContent = many ? '画像はそれぞれドラッグして動かせます。' : '人物はマウスでドラッグして動かせます。';
-  syncDim();
+  syncDragNote(); syncDim();
+}
+function syncDragNote() {
+  const many = LAYOUTS[S.layout].multi && multi(), deco = S.items.length > 0;
+  $('#dragNote').textContent = many ? (deco ? '画像と飾りは、それぞれドラッグして動かせます。' : '画像はそれぞれドラッグして動かせます。') : deco ? '人物と飾りは、マウスでドラッグして動かせます。' : '人物はマウスでドラッグして動かせます。';
 }
 /* 画像が増減したあとの後始末 */
 function imgsChanged(wasMulti) {
+  epoch++; // 画像を入れ替えた印（読み込み中の「前回の続き」で上書きしないため）
   S.sel = clamp(S.sel, 0, Math.max(0, imgs().length - 1));
   if (LAYOUTS[S.layout].multi && !multi()) S.layout = 'right';
   else if (multi() && !wasMulti && !LAYOUTS[S.layout].multi) S.layout = 'strips'; // 2枚目が入ったら、ならべる型に切り替える
   syncSel(); syncTune(); buildSwatches(); syncMats(); saveState(); refresh();
+}
+
+/* 吹き出し・飾りの見本と、足したものの手直し */
+const itemBtns = new Map(); let gone = null; // gone: 外したばかりの飾り（「元に戻す」用）
+function buildItemCands() {
+  const box = $('#itemCands');
+  for (const type of ITEM_ORDER) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'cand item'; b.setAttribute('aria-label', ITEMS[type].name + 'を足す');
+    b.innerHTML = '<span class="cand-frame"><canvas width="300" height="200"></canvas></span><span class="cand-name"></span>';
+    b.querySelector('.cand-name').textContent = ITEMS[type].name;
+    b.addEventListener('click', () => addItem(type)); box.appendChild(b); itemBtns.set(type, b);
+  }
+  const cs = $('#itemColors');
+  for (const [label, color] of TINTS) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.setAttribute('role', 'radio'); b.dataset.color = color || '';
+    const i = document.createElement('i'); if (color) i.style.background = color; b.append(i, document.createTextNode(label));
+    b.addEventListener('click', () => { const it = picked(); if (!it) return; it.color = color; syncItems(); saveState(); refresh(); });
+    cs.appendChild(b);
+  }
+  arrowKeys(cs);
+}
+function drawIcon(cv, type) { // 見本は、いまの雰囲気で描く
+  const ctx = cv.getContext('2d'), LW = 420, LH = 280, k = cv.width / LW, T = themeOf(S.theme), d = ITEMS[type];
+  ctx.setTransform(k, 0, 0, k, 0, 0); ctx.clearRect(0, 0, LW, LH);
+  const env = {ctx, k, T, M: fm(T.font), perChar: false, info: {sizes: []}, focus: [LW / 2, LH / 2], f: 1, bare: false, img: false, hits: []};
+  const fit = {bubble: 1.04, shout: 1, box: 1.5, stamp: 1.12, arrow: 1.3, ring: .88, anger: 1.3, sweat: 1.22, spark: 1.05, heart: 1.25}[type] || 1;
+  drawItem(env, itemStyle(T), {type, text: d.text || '', color: null}, {x: LW / 2, y: LH / 2, r: d.r || 0, flip: !!d.flip, s: fit});
+}
+const picked = () => S.items.find(it => it.id === S.pick) || null;
+const itemLabel = it => { const d = ITEMS[it.type], t = it.text.trim(); return d.text !== undefined && t ? `${d.name}「${[...t].slice(0, 6).join('')}${[...t].length > 6 ? '…' : ''}」` : d.name; };
+function addItem(type) {
+  if (S.items.length >= ITEM_MAX) return;
+  const d = ITEMS[type], f = FACE[layoutNow(S.layout)] || [W / 2, 300], n = S.items.filter(it => it.type === type).length; // 同じ種類を重ねて足すときは、少しずつずらす
+  const it = {id: newId('i'), type, x: clamp(f[0] + d.at[0] + n * 36, d.half[0] + 8, W - d.half[0] - 8), y: clamp(f[1] + d.at[1] + n * 36, d.half[1] + 8, H - d.half[1] - 8), s: 1, r: d.r || 0, flip: !!d.flip, text: d.text || '', color: null};
+  S.items.push(it); S.pick = it.id; gone = null; syncItems(); saveState(); ensureFonts(); refresh();
+  const r = big.getBoundingClientRect(), calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches; // 仕上がりが画面の外にあるときは、見える所まで送る
+  if (r.bottom < 80 || r.top > innerHeight - 80) big.scrollIntoView({block: 'center', behavior: calm ? 'auto' : 'smooth'});
+  else if (d.text !== undefined && window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches) { const el = $('#itemText'); el.focus({preventScroll: true}); el.select(); }
+}
+function syncItemVals() { // スライダーは、いま画面に出ている向きの値で見せる
+  const it = picked(); if (!it) return; const p = placed(it, layoutNow(S.layout));
+  $('#iSize').value = Math.round(it.s * 100); $('#iRot').value = Math.round(p.r); $('#iX').value = p.x / W * 100; $('#iY').value = p.y / H * 100;
+}
+function syncItems() {
+  const it = picked(), chips = $('#itemChips'); if (!it) S.pick = null;
+  $('#itemBox').hidden = !S.items.length; chips.textContent = '';
+  S.items.forEach(x => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.setAttribute('role', 'radio'); b.textContent = itemLabel(x);
+    const on = x.id === S.pick; b.setAttribute('aria-checked', on); b.tabIndex = on || (!it && x === S.items[0]) ? 0 : -1;
+    b.addEventListener('click', () => { S.pick = S.pick === x.id ? null : x.id; syncItems(); refresh('main'); const n = $('#itemChips [aria-checked="true"]') || $('#itemChips .chip'); if (n) n.focus(); });
+    chips.appendChild(b);
+  });
+  $('#itemEdit').hidden = !it; $('#itemHint').hidden = !!it;
+  $('#itemGone').hidden = !gone; if (gone) $('#itemGoneText').textContent = `${itemLabel(gone.it)}を外しました。`;
+  syncDragNote();
+  $('#itemNote').textContent = S.items.length >= ITEM_MAX ? `飾りは${ITEM_MAX}個までです。使わないものを外すと、また足せます。` : '足したあとは、仕上がりの画像の上でドラッグして動かせます。文字・大きさ・位置は「仕上げて保存」で変えられます。';
+  itemBtns.forEach(b => { b.disabled = S.items.length >= ITEM_MAX; });
+  if (!it) return;
+  const d = ITEMS[it.type], el = $('#itemText');
+  $('#itemTextField').hidden = d.text === undefined; if (document.activeElement !== el || el.value.slice(0, 30) !== it.text) el.value = it.text;
+  $('#iFlip').hidden = !d.canFlip; $('#itemColorRow').hidden = !d.tint;
+  $('#itemColors').querySelectorAll('button').forEach(b => { const on = (it.color || '') === b.dataset.color; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; if (!b.dataset.color) b.querySelector('i').style.background = it.type === 'stamp' ? lastOf(themeOf(S.theme).emph.fill) : itemStyle(themeOf(S.theme)).hot; });
+  syncItemVals();
 }
 
 /* ================= まとめて決める（おまかせ3案・お気に入り） ================= */
@@ -1405,7 +1712,7 @@ function syncQuick() { // いまの設定と同じ組み合わせに印を付け
 
 /* 描き直しの段取り: 大きいプレビューを先に、候補はあとから順番に */
 let raf = 0, needMain = false, needCands = false, queue = [], minSizes = {};
-function refresh(scope) { needMain = true; if (scope !== 'main') needCands = true; if (!raf) raf = requestAnimationFrame(tick); }
+function refresh(scope) { needMain = true; if (scope !== 'main') needCands = true; if (!raf) raf = requestAnimationFrame(tick); touch(); }
 function tick() {
   raf = 0;
   if (needMain) { needMain = false; drawMain(); }
@@ -1415,7 +1722,8 @@ function tick() {
       .concat(THEMES.map(t => () => { draw(cand.theme.get(t.id).querySelector('canvas'), {theme: t.id}); }));
     buildProps(); syncQuick();
     queue = props.map((p, i) => () => { drawWith(propBtns[i].querySelector('canvas'), p); }).concat(queue,
-      [...$('#favCands').querySelectorAll('.cand')].map(b => () => { const f = favs[+b.dataset.i]; if (f) drawWith(b.querySelector('canvas'), f.st); }));
+      [...$('#favCands').querySelectorAll('.cand')].map(b => () => { const f = favs[+b.dataset.i]; if (f) drawWith(b.querySelector('canvas'), f.st); }),
+      ITEM_ORDER.map(type => () => { drawIcon(itemBtns.get(type).querySelector('canvas'), type); }));
   }
   if (queue.length) {
     const t0 = performance.now();
@@ -1428,9 +1736,9 @@ function flagBiggest() {
   ids.forEach(id => { if (!top || minSizes[id] > minSizes[top] * 1.02) top = id; });
   cand.layout.forEach((b, id) => { b.querySelector('.flag').hidden = id !== top; });
 }
-let lastInfo = null, lastHits = [];
+let lastInfo = null, lastHits = [], lastItems = [];
 function drawMain() {
-  const info = draw(big, {badge: S.badge}); draw(mini, {badge: true}); lastInfo = info; lastHits = info.hits;
+  const info = draw(big, {badge: S.badge, pick: S.pick}); draw(mini, {badge: true}); lastInfo = info; lastHits = info.hits; lastItems = info.items;
   const pill = $('#legPill'), txt = $('#legText'), px = info.min * 168 / W;
   if (!info.sizes.length) { pill.hidden = true; txt.textContent = 'メインの文字を入れると、ここで読みやすさを確かめられます。'; }
   else {
@@ -1463,26 +1771,97 @@ function buildRecipe(info) {
 let fontKey = '';
 function ensureFonts() {
   if (!document.fonts || !document.fonts.load) return;
-  const text = S.main + S.sub + S.label + '国永あア0123456789:';
+  const text = S.main + S.sub + S.label + S.items.map(it => it.text).join('') + ITEM_ORDER.map(k => ITEMS[k].text || '').join('') + '国永あア0123456789:';
   if (text === fontKey) return; fontKey = text;
   Promise.all(Object.keys(FONTS).map(fk => document.fonts.load(fontCss(fk, 40), text).catch(() => null))).then(() => { resetMetrics(); refresh(); });
 }
 
 /* ================= 操作 ================= */
-function setErr(msg, info) { const n = $('#matNote'); if (msg) { n.textContent = msg; n.classList.toggle('err', !info); } else { n.textContent = '画像は枠にドラッグしても、コピーして貼り付け（Ctrl+V）しても入ります。画像はこのページの外へ送られません。'; n.classList.remove('err'); } }
+const MAT_NOTE = '画像は枠にドラッグしても、コピーして貼り付け（Ctrl+V）しても入ります。画像も動画も、このページの外へは送られません。';
+function setErr(msg, info) { const n = $('#matNote'); if (msg) { n.textContent = msg; n.classList.toggle('err', !info); } else { n.textContent = MAT_NOTE; n.classList.remove('err'); } }
+const isVideo = f => !!f && (/^video\//.test(f.type) || (!f.type && /\.(mp4|m4v|mov|webm|mkv|avi|ts|flv)$/i.test(f.name || '')));
+const FULL = '追加の画像は3枚までです。入れ替えるときは、×で外してから追加してください。';
 async function takeFile(file, slot) {
+  if (isVideo(file)) { openVideo(file, true); return; } // 動画は、場面を選ぶところへ回す
   if (!file || !/^image\//.test(file.type)) { setErr('画像ファイル（PNG・JPG・WebP）を入れてください。'); return; }
-  if (slot === 'extra' && S.extra.length >= 3) { setErr('追加の画像は3枚までです。入れ替えるときは、×で外してから追加してください。'); return; }
+  if (slot === 'extra' && S.extra.length >= 3) { setErr(FULL); return; }
   let c; try { c = await fileToCanvas(file); } catch (e) { setErr('この画像は読み込めませんでした。PNG・JPG・WebPで試してください。'); return; }
+  placeImage(c, slot, file);
+}
+/* 読み込んだ画像（または動画の1場面）を、決まった枠に入れる。戻り値: 実際に入れた枠 */
+function placeImage(c, slot, file) {
+  if (slot === 'extra' && S.extra.length >= 3) { setErr(FULL); return null; }
   setErr('');
   if (slot === 'auto') slot = analyze(c).cutout ? 'person' : 'bg';
   if (slot === 'extra' && S.sample && S.person) { slot = 'person'; setErr('見本の代わりに、1枚目として「人物」に入れました。続けて追加すると2枚目になります。', true); }
-  const was = multi();
-  if (slot === 'person') { S.person = prepPerson(c); S.sample = false; S.sel = 0; imgsChanged(was); }
-  else if (slot === 'extra') { if (S.extra.length >= 3) return; S.extra.push(prepPerson(c)); S.sel = imgs().length - 1; imgsChanged(was); }
-  else { S.bg = prepBg(c); syncMats(); refresh(); }
+  const was = multi(); epoch++;
+  if (slot === 'person') { S.person = prepPerson(c); S.sample = false; S.sel = 0; keepSource(S.person, c, file); imgsChanged(was); }
+  else if (slot === 'extra') { const P = prepPerson(c); S.extra.push(P); S.sel = imgs().length - 1; keepSource(P, c, file); imgsChanged(was); }
+  else { S.bg = prepBg(c); keepSource(S.bg, c, file); syncMats(); refresh(); }
+  return slot;
 }
-function useSample() { const was = multi(); S.person = prepPerson(makeSample()); S.sample = true; S.sel = 0; imgsChanged(was); }
+function useSample() { const was = multi(); epoch++; S.person = prepPerson(makeSample()); S.sample = true; S.sel = 0; imgsChanged(was); }
+
+/* ================= 動画から場面を取り込む ================= */
+const vid = $('#vid'); let vidUrl = null;
+const vidSay = (t, bad) => { const n = $('#vidMsg'); n.textContent = t || ''; n.classList.toggle('err', !!bad); };
+const clock = t => { t = Math.max(0, t || 0); const m = Math.floor(t / 60), s = t - m * 60; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(2); };
+const showTime = () => { $('#vidTime').textContent = clock(vid.currentTime) + (isFinite(vid.duration) && vid.duration ? ' / ' + clock(vid.duration) : ''); };
+function closeVideo() {
+  if (!vidUrl) return; const u = vidUrl; vidUrl = null;
+  try { vid.pause(); vid.removeAttribute('src'); vid.load(); } catch (e) {}
+  URL.revokeObjectURL(u); $('#vidBox').hidden = true; $('#closeVideo').hidden = true; $('#pickVideo').textContent = '動画を選ぶ'; vidSay('');
+}
+function openVideo(file, show) {
+  if (!isVideo(file)) { setErr('動画ファイル（MP4・WebM など）を選んでください。'); return; }
+  closeVideo(); setErr(''); vidUrl = URL.createObjectURL(file);
+  $('#vidBox').hidden = false; $('#closeVideo').hidden = false; $('#pickVideo').textContent = '別の動画を選ぶ'; vidSay('動画を読み込んでいます…');
+  vid.src = vidUrl; vid.load(); showTime();
+  if (show) $('#dropVideo').scrollIntoView({block: 'nearest'});
+}
+/* 止めた場面が画面に出るまで待つ（コマ送りや時刻の移動の直後は、少し時間がかかる） */
+const frameReady = () => !vid.seeking && vid.readyState >= 2 && vid.videoWidth > 0;
+const waitFrame = ms => new Promise(r => {
+  const evs = ['seeked', 'canplay', 'loadeddata', 'error'], done = () => { evs.forEach(ev => vid.removeEventListener(ev, check)); clearTimeout(t); r(); }, check = () => { if (frameReady() || vid.error) done(); }, t = setTimeout(done, ms);
+  evs.forEach(ev => vid.addEventListener(ev, check)); check();
+});
+let capturing = false;
+async function capture(slot) {
+  if (!vidUrl || capturing) return; capturing = true;
+  try {
+    vid.pause();
+    if (!frameReady() && vid.readyState >= 1) { vidSay('場面を読み込んでいます…'); await waitFrame(4000); }
+    if (!frameReady()) { vidSay('まだ場面が出ていません。いちど再生してから、使いたい瞬間で止めてください。', true); return; }
+    const vw = vid.videoWidth, vh = vid.videoHeight, sc = Math.min(1, 2200 / Math.max(vw, vh)), c = mk(vw * sc, vh * sc), x = c.getContext('2d'); x.imageSmoothingQuality = 'high';
+    try { x.drawImage(vid, 0, 0, c.width, c.height); x.getImageData(0, 0, 1, 1); } catch (e) { vidSay('この場面は取り込めませんでした。別の動画で試してください。', true); return; }
+    const at = clock(vid.currentTime), used = placeImage(c, slot, null), names = {person: '人物', bg: '背景', extra: '追加の画像'};
+    if (!used) vidSay(FULL, true);
+    else vidSay(`${at} の場面を「${names[used]}」に入れました。` + (used !== slot ? '見本の代わりに、1枚目として入れています。' : ''));
+  } finally { capturing = false; }
+}
+function wireVideo() {
+  const f = $('#fileVideo'), d = $('#dropVideo');
+  vid.setAttribute('controlslist', 'nodownload nofullscreen noremoteplayback'); vid.disablePictureInPicture = true; // 使わないボタンは出さない
+  $('#pickVideo').addEventListener('click', () => f.click());
+  f.addEventListener('change', () => { if (f.files[0]) openVideo(f.files[0]); f.value = ''; });
+  $('#closeVideo').addEventListener('click', () => { closeVideo(); $('#pickVideo').focus(); });
+  d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('over'); });
+  d.addEventListener('dragleave', () => d.classList.remove('over'));
+  d.addEventListener('drop', e => { e.preventDefault(); d.classList.remove('over'); const fl = e.dataTransfer && e.dataTransfer.files; if (fl && fl.length) openVideo(fl[0]); });
+  vid.addEventListener('loadedmetadata', () => { if (!vidUrl) return; showTime();
+    if (!vid.videoWidth) vidSay('この動画は、映像を表示できませんでした。MP4（H.264）かWebMの動画で試してください。', true);
+    else vidSay('再生するか、下のボタンで少しずつ動かして、使いたい瞬間で止めてください。'); });
+  let refused = false; // ページの決まりで動画そのものを開けない場合（動画の種類の問題ではない）
+  document.addEventListener('securitypolicyviolation', e => { if (vidUrl && /media-src/.test(e.effectiveDirective || e.violatedDirective || '')) { refused = true; vidSay('この画面では、動画を開けませんでした。Web版（ブラウザで開くページ）なら使えます。', true); } });
+  vid.addEventListener('error', () => { if (vidUrl && !refused) vidSay('この動画は、このブラウザでは開けませんでした。MP4（H.264）かWebMの動画で試してください。', true); });
+  for (const ev of ['timeupdate', 'seeked', 'durationchange']) vid.addEventListener(ev, showTime);
+  $('#vidBox').querySelectorAll('[data-step]').forEach(b => b.addEventListener('click', () => {
+    if (!vidUrl || vid.readyState < 1) return; vid.pause();
+    const st = b.dataset.step, dt = st === 'f' ? 1 / 30 : st === '-f' ? -1 / 30 : +st, end = isFinite(vid.duration) ? Math.max(0, vid.duration - .001) : Infinity; // 1コマは、およそ30分の1秒
+    vid.currentTime = clamp(vid.currentTime + dt, 0, end);
+  }));
+  $('#vidBox').querySelectorAll('[data-cap]').forEach(b => b.addEventListener('click', () => capture(b.dataset.cap)));
+}
 function syncTune() {
   $('#pZoom').value = Math.round(S.adj.zoom * 100); $('#pX').value = Math.round(S.adj.dx * 100); $('#pY').value = Math.round(S.adj.dy * 100); $('#tScale').value = Math.round(S.textScale * 100);
   $('#tFlip').setAttribute('aria-pressed', S.adj.flip); $('#tBlur').setAttribute('aria-pressed', S.blur); $('#tDeco').setAttribute('aria-pressed', S.deco); $('#tBadge').setAttribute('aria-pressed', S.badge); $('#tSmallP').setAttribute('aria-pressed', S.smallP);
@@ -1506,7 +1885,7 @@ function wire() {
   });
   $('#resetPerson').addEventListener('click', useSample);
   $('#nonePerson').addEventListener('click', () => { const was = multi(); S.person = null; S.sample = false; imgsChanged(was); });
-  $('#clearBg').addEventListener('click', () => { S.bg = null; syncMats(); refresh(); });
+  $('#clearBg').addEventListener('click', () => { epoch++; S.bg = null; syncMats(); refresh(); });
 
   const mainEl = $('#mainText'), subEl = $('#subText'), labEl = $('#labelText');
   mainEl.value = S.main; subEl.value = S.sub; labEl.value = S.label;
@@ -1522,18 +1901,55 @@ function wire() {
   rng('#pZoom', v => S.adj.zoom = v); rng('#pX', v => S.adj.dx = v); rng('#pY', v => S.adj.dy = v); rng('#tScale', v => S.textScale = v);
   $('#tReset').addEventListener('click', () => { S.adj = Object.assign(newAdj(), {flip: S.adj.flip}); S.textScale = 1; syncTune(); refresh(); });
 
-  // 人物をドラッグで動かす（タッチは縦スクロールを優先するので、スライダーを使う）
+  // 吹き出し・飾り: 文字・大きさ・向き・場所（人物が左に来る型では左右を裏返して見せているので、値もそれに合わせる）
+  const itEl = $('#itemText'), flipped = () => mirrored(layoutNow(S.layout));
+  itEl.addEventListener('input', () => { const it = picked(); if (!it) return; it.text = itEl.value.slice(0, 30); syncItems(); saveState(); ensureFonts(); refresh('main'); });
+  itEl.addEventListener('change', () => refresh());
+  const irng = (id, fn) => { const el = $(id); el.addEventListener('input', () => { const it = picked(); if (!it) return; fn(it, +el.value); refresh('main'); }); el.addEventListener('change', () => { saveState(); refresh(); }); };
+  irng('#iSize', (it, v) => { it.s = clamp(v / 100, .4, 2.5); });
+  irng('#iRot', (it, v) => { it.r = flipped() ? -v : v; });
+  irng('#iX', (it, v) => { const x = v / 100 * W; it.x = flipped() ? W - x : x; });
+  irng('#iY', (it, v) => { it.y = v / 100 * H; });
+  $('#iFlip').addEventListener('click', () => { const it = picked(); if (!it) return; it.flip = !it.flip; saveState(); refresh(); });
+  $('#iDel').addEventListener('click', () => {
+    const i = S.items.findIndex(x => x.id === S.pick); if (i < 0) return;
+    gone = {it: S.items[i], i}; S.items.splice(i, 1); S.pick = null; syncItems(); saveState(); refresh(); $('#itemBack').focus();
+  });
+  $('#itemBack').addEventListener('click', () => {
+    if (!gone || S.items.length >= ITEM_MAX) return;
+    S.items.splice(Math.min(gone.i, S.items.length), 0, gone.it); S.pick = gone.it.id; gone = null; syncItems(); saveState(); ensureFonts(); refresh();
+    const n = $('#itemChips [aria-checked="true"]'); if (n) n.focus();
+  });
+
+  // 仕上がりの上でドラッグ: 飾りをつかめばその飾りを、それ以外は人物（画像）を動かす。タッチは縦スクロールを優先するので、スライダーを使う
   let drag = null;
   const inPoly = (pts, x, y) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
+  const at = e => { const r = big.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+  const itemAt = (x, y) => { // 上に重なっているものから順に、枠（回転ぶんも含む）の中かどうかを見る
+    for (let i = lastItems.length - 1; i >= 0; i--) { const g = lastItems[i], a = g.r * Math.PI / 180, dx = x - g.x, dy = y - g.y, lx = dx * Math.cos(a) + dy * Math.sin(a), ly = dy * Math.cos(a) - dx * Math.sin(a); if (Math.abs(lx) <= g.hw + 6 && Math.abs(ly) <= g.hh + 6) return g; }
+    return null;
+  };
   big.addEventListener('pointerdown', e => {
-    if (e.pointerType === 'touch' || !lastHits.length) return;
-    const r = big.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+    if (e.pointerType === 'touch') return;
+    const [x, y] = at(e), g = itemAt(x, y), it = g && S.items.find(i => i.id === g.id);
+    if (it) {
+      if (S.pick !== it.id) { S.pick = it.id; syncItems(); }
+      drag = {it, x: e.clientX, y: e.clientY, ix: g.x, iy: g.y}; big.setPointerCapture(e.pointerId); big.classList.add('dragging'); refresh('main'); return;
+    }
+    if (S.pick) { S.pick = null; syncItems(); refresh('main'); } // 飾りのない所を押したら、選ぶのをやめる
+    if (!lastHits.length) return;
     const hit = [...lastHits].reverse().find(h => inPoly(h.pts, x, y)) || lastHits[0]; // つかんだ場所の画像を動かす
     if (hit.i !== S.sel) { S.sel = hit.i; syncTune(); syncMats(); }
     drag = {x: e.clientX, y: e.clientY, dx: S.adj.dx, dy: S.adj.dy}; big.setPointerCapture(e.pointerId); big.classList.add('dragging');
   });
-  big.addEventListener('pointermove', e => { if (!drag) return; const r = big.getBoundingClientRect(); S.adj.dx = clamp(drag.dx + (e.clientX - drag.x) / r.width, -.5, .5); S.adj.dy = clamp(drag.dy + (e.clientY - drag.y) / r.height, -.5, .5); syncTune(); refresh('main'); });
-  const end = () => { if (!drag) return; drag = null; big.classList.remove('dragging'); refresh(); };
+  big.addEventListener('pointermove', e => {
+    if (!drag) { if (e.pointerType !== 'touch') { const [x, y] = at(e); big.style.cursor = itemAt(x, y) ? 'move' : ''; } return; }
+    const r = big.getBoundingClientRect(), mx = (e.clientX - drag.x) / r.width, my = (e.clientY - drag.y) / r.height;
+    if (drag.it) { const nx = clamp(drag.ix + mx * W, 0, W); drag.it.x = flipped() ? W - nx : nx; drag.it.y = clamp(drag.iy + my * H, 0, H); syncItemVals(); }
+    else { S.adj.dx = clamp(drag.dx + mx, -.5, .5); S.adj.dy = clamp(drag.dy + my, -.5, .5); syncTune(); }
+    refresh('main');
+  });
+  const end = () => { if (!drag) return; if (drag.it) saveState(); drag = null; big.classList.remove('dragging'); refresh(); };
   big.addEventListener('pointerup', end); big.addEventListener('pointercancel', end);
 
   // おまかせ3案
@@ -1615,9 +2031,200 @@ function sync(ask, changed) { // 同じ場所への読み書きは1つずつ順�
 }
 function storeFavs() { keepLocal(); showWhere(); sync(true, true); }
 
+/* ================= 作りかけと履歴 =================
+   文字・設定・飾りは localStorage、入れた画像と履歴は IndexedDB に置く（どちらもこのブラウザの中だけ）。
+   使えない環境では、だまって何もしない（そのときも、ほかの機能は今までどおり動く） */
+const DBN = 'samune-katagami', HIST_MAX = 12;
+let dbp = null, dbOk = true;
+function db() {
+  if (!dbOk) return Promise.reject(new Error('no storage'));
+  return dbp || (dbp = new Promise((res, rej) => {
+    let rq; try { rq = indexedDB.open(DBN, 1); } catch (e) { rej(e); return; }
+    const timer = setTimeout(() => rej(new Error('timeout')), 4000);
+    rq.onupgradeneeded = () => { const d = rq.result; for (const n of ['projects', 'blobs']) if (!d.objectStoreNames.contains(n)) d.createObjectStore(n, {keyPath: 'id'}); };
+    rq.onsuccess = () => { clearTimeout(timer); const d = rq.result; d.onversionchange = () => { d.close(); dbp = null; }; d.onclose = () => { dbp = null; }; res(d); };
+    rq.onerror = () => { clearTimeout(timer); rej(rq.error || new Error('open')); }; rq.onblocked = () => { clearTimeout(timer); rej(new Error('blocked')); };
+  }).catch(e => { dbOk = false; dbp = null; syncTools(); throw e; }));
+}
+const tx = (store, mode, fn) => db().then(d => new Promise((res, rej) => {
+  const t = d.transaction(store, mode); let out;
+  t.oncomplete = () => res(out); t.onerror = () => rej(t.error || new Error('tx')); t.onabort = () => rej(t.error || new Error('abort'));
+  const r = fn(t.objectStore(store)); if (r) r.onsuccess = () => { out = r.result; };
+}));
+const dbGet = (s, k) => tx(s, 'readonly', o => o.get(k)), dbAll = s => tx(s, 'readonly', o => o.getAll()), dbKeys = s => tx(s, 'readonly', o => o.getAllKeys());
+const dbPut = (s, v) => tx(s, 'readwrite', o => { o.put(v); }), dbDel = (s, keys) => tx(s, 'readwrite', o => { for (const k of [].concat(keys)) o.delete(k); });
+
+/* 入れた画像の元データを残す。大きすぎるものは、取り込んだ大きさで保存し直す */
+async function keepSource(P, c, file) {
+  if (!dbOk) return; const id = P.bid = newId('b');
+  try {
+    let blob = file && file.size <= 3e6 ? file : await toBlob(c, P.cutout ? 'image/png' : 'image/jpeg', .92);
+    if (blob && blob.size > 8e6) { const sc = 1500 / Math.max(c.width, c.height); if (sc < 1) { const t = mk(c.width * sc, c.height * sc), x = t.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(c, 0, 0, t.width, t.height); blob = await toBlob(t, 'image/png'); } }
+    if (!blob) throw new Error('blob');
+    const rec = {id, buf: await blob.arrayBuffer(), type: blob.type || 'image/png'};
+    try { await dbPut('blobs', rec); } catch (e) { await sweep(true); await dbPut('blobs', rec); } // 入らなければ、使っていない画像を片づけてもう一度
+  } catch (e) { if (P.bid === id) P.bid = null; if (dbOk) toolSay('保存場所がいっぱいのため、いま入れた画像は作りかけに残せませんでした。履歴を減らすと残せます。'); }
+  touch();
+}
+/* どこからも使われていない画像を消す。使われているかどうかは、保存してある中身を読み直して確かめる
+   （ほかのタブが残した履歴や作りかけの画像を、まちがって消さないため。入れたばかりの画像も残す） */
+const bidsOf = st => (st ? [st.person, st.bg].concat(st.extra || []) : []).filter(x => x && x.bid).map(x => x.bid);
+async function sweep(now) {
+  try {
+    const live = new Set(bidsOf(S)); for (const st of hist.concat(kept, await dbAll('projects'))) bidsOf(st).forEach(b => live.add(b));
+    const dead = (await dbKeys('blobs')).filter(k => !live.has(k) && (now || Date.now() - idTime(k) > 6e4));
+    if (dead.length) await dbDel('blobs', dead);
+  } catch (e) {}
+}
+
+/* いまの画像の置き方（どの画像を、どの位置・大きさで） */
+const copyAdj = a => ({dx: clamp(+a.dx || 0, -.5, .5), dy: clamp(+a.dy || 0, -.5, .5), zoom: clamp(+a.zoom || 1, .5, 2.2), flip: !!a.flip});
+function imageRefs() {
+  const ref = P => ({bid: P.bid, adj: copyAdj(P.adj)}), P = S.person;
+  return {person: !P ? null : S.sample ? {sample: true, adj: copyAdj(P.adj)} : P.bid ? ref(P) : {sample: true}, bg: S.bg && S.bg.bid ? {bid: S.bg.bid} : null, extra: S.extra.filter(X => X.bid).map(ref), sel: S.sel};
+}
+const ownImages = r => !!r && !!((r.person && r.person.bid) || (r.bg && r.bg.bid) || (r.extra && r.extra.length));
+async function loadImages(rec) { // 残してあった画像を読み直す。読めなかったものは飛ばす
+  let lost = 0;
+  const one = async (ref, prep) => {
+    if (!ref || !ref.bid) return null;
+    try { const b = await dbGet('blobs', ref.bid); if (!b || !b.buf) throw new Error('gone');
+      const P = prep(await fileToCanvas(new Blob([b.buf], {type: b.type || 'image/png'}))); P.bid = ref.bid; if (ref.adj && P.adj) P.adj = copyAdj(ref.adj); return P;
+    } catch (e) { lost++; return null; }
+  };
+  const [person, bg, ...extra] = await Promise.all([one(rec.person, prepPerson), one(rec.bg, prepBg)].concat((Array.isArray(rec.extra) ? rec.extra : []).slice(0, 3).map(r => one(r, prepPerson))));
+  return {person, bg, extra: extra.filter(Boolean), lost};
+}
+function setImages(rec, got) {
+  if (got.person) { S.person = got.person; S.sample = false; }
+  else if (rec.person) { // 見本、または読めなかった画像の代わりに見本
+    if (!(S.sample && S.person)) S.person = prepPerson(makeSample()); S.sample = true;
+    S.person.adj = rec.person.sample && rec.person.adj ? copyAdj(rec.person.adj) : newAdj();
+  } else { S.person = null; S.sample = false; }
+  S.bg = got.bg; S.extra = got.extra; S.sel = clamp(Math.round(+rec.sel) || 0, 0, Math.max(0, imgs().length - 1));
+}
+
+/* 作りかけ: 変更のたびに、少し待ってからまとめて残す */
+let ready = false, epoch = 0, lastDraft = '', saveTimer = 0;
+function touch() { if (ready && !saveTimer) saveTimer = setTimeout(persist, 500); }
+function persist() {
+  clearTimeout(saveTimer); saveTimer = 0; if (!ready) return;
+  saveState(); if (!dbOk) return;
+  const rec = imageRefs(), key = JSON.stringify(rec); if (key === lastDraft) return; lastDraft = key;
+  dbPut('projects', Object.assign({id: 'draft', t: Date.now()}, rec)).catch(() => {});
+}
+/* 画面のすべてを、いまの状態に合わせ直す（履歴を開いたとき・新しく作るとき・元に戻すとき） */
+function syncAll() {
+  $('#mainText').value = S.main; $('#subText').value = S.sub; $('#labelText').value = S.label;
+  S.sel = clamp(S.sel, 0, Math.max(0, imgs().length - 1)); if (LAYOUTS[S.layout].multi && !multi()) S.layout = 'right';
+  gone = null; buildChips(); syncSel(); buildSwatches(); buildEmphSwatches(); syncTune(); syncMats(); syncItems(); saveState(); ensureFonts(); refresh();
+}
+const SNAP = ['main', 'sub', 'label', 'layout', 'theme', 'color', 'emphColor', 'dim', 'blur', 'deco', 'smallP', 'textScale', 'person', 'sample', 'bg', 'sel'];
+function snapshot() { const o = {emph: new Set(S.emph), extra: S.extra.slice(), items: S.items.map(it => Object.assign({}, it))}; for (const k of SNAP) o[k] = S[k]; return o; }
+function putBack(o) { for (const k of SNAP) S[k] = o[k]; S.emph = new Set(o.emph); S.extra = o.extra.slice(); S.items = o.items.map(it => Object.assign({}, it)); S.pick = null; epoch++; syncAll(); }
+
+/* いちばん上の道具: 新しく作る・履歴・元に戻す */
+let hist = [], kept = [], undo = null; // kept: 「元に戻す」のために手元に残している状態
+const TOOL_NOTE = '作りかけと保存したサムネは、このブラウザに残ります。';
+function toolSay(text, label, run) { // label と run を渡すと、「元に戻す」ボタンを出す
+  undo = run || null; if (!run) kept = [];
+  $('#toolText').textContent = text || (dbOk ? TOOL_NOTE : ''); const b = $('#undoBtn'); b.hidden = !run; if (run) b.textContent = label;
+}
+function syncTools() { const b = $('#histBtn'); b.hidden = !dbOk; b.textContent = hist.length ? `履歴（${hist.length}）` : '履歴'; if (!dbOk) { $('#histSheet').hidden = true; if ($('#toolText').textContent === TOOL_NOTE) $('#toolText').textContent = ''; } }
+function swapState(snap, text, back) { // 「元に戻す」と「やり直す」を行き来できるようにして、押しまちがえても何も失わない
+  const now = snapshot(); putBack(snap);
+  toolSay(text, back ? 'やり直す' : '元に戻す', () => swapState(now, back ? 'やり直しました。' : '元に戻しました。', !back)); kept = [now];
+}
+function startNew() {
+  const snap = snapshot(); epoch++;
+  S.main = ''; S.emph = new Set(); S.sub = ''; S.label = ''; S.items = []; S.pick = null;
+  S.person = prepPerson(makeSample()); S.sample = true; S.bg = null; S.extra = []; S.sel = 0; SPARE.adj = newAdj();
+  syncAll(); toolSay('新しくしました。型・雰囲気・色はそのままです。', '元に戻す', () => swapState(snap, '元に戻しました。', true)); kept = [snap];
+  $('#mainText').focus();
+}
+const STYLE_ALL = ['layout', 'theme'].concat(STYLE);
+function projectNow() {
+  const style = {}; for (const k of STYLE_ALL) style[k] = S[k];
+  return Object.assign({text: {main: S.main, emph: [...S.emph], sub: S.sub, label: S.label}, style, items: S.items.map(it => Object.assign({}, it))}, imageRefs());
+}
+async function addHistory(canvas) { // 保存した画像を、作り直せる形で履歴に残す。戻り値: 残せたか
+  if (!dbOk || !ready) return false;
+  try {
+    const p = projectNow(), sig = JSON.stringify(p), t = mk(480, 270), x = t.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(canvas, 0, 0, t.width, t.height);
+    const jpg = await toBlob(t, 'image/jpeg', .82), at = hist.findIndex(h => h.sig === sig); // まったく同じ内容なら、前のものを上に出すだけ
+    const rec = Object.assign(p, {id: at >= 0 ? hist[at].id : newId('h'), t: Date.now(), sig, name: (S.main.replace(/\s+/g, ' ').trim() || S.sub.trim() || S.label.trim() || '文字なし').slice(0, 24), thumb: jpg ? await jpg.arrayBuffer() : null});
+    await dbPut('projects', rec);
+    if (at >= 0) hist.splice(at, 1); hist.unshift(rec);
+    const over = hist.splice(HIST_MAX); if (over.length) dbDel('projects', over.map(h => h.id)).catch(() => {});
+    renderHist(); return true;
+  } catch (e) { return false; }
+}
+async function openProject(rec) {
+  const snap = snapshot(), my = ++epoch; toolSay('開いています…');
+  const got = await loadImages(rec); if (my !== epoch) return;
+  const tx_ = rec.text || {}, st = cleanFav({name: 'x', st: rec.style}).st;
+  S.main = String(tx_.main || ''); S.emph = new Set(Array.isArray(tx_.emph) ? tx_.emph : []); S.sub = String(tx_.sub || ''); S.label = String(tx_.label || '');
+  for (const k of STYLE_ALL) S[k] = st[k]; S.items = cleanItems(rec.items); S.pick = null;
+  setImages(rec, got); syncAll();
+  toolSay(`「${rec.name}」を開きました。` + (got.lost ? '一部の画像は残っていなかったので、入っていません。' : ''), '元に戻す', () => swapState(snap, '元に戻しました。', true)); kept = [snap];
+  const r = big.getBoundingClientRect(); if (r.bottom < 80 || r.top > innerHeight - 80) $('.cols').scrollIntoView({block: 'start'});
+}
+const dateText = t => { const d = new Date(t), n = new Date(), p = v => String(v).padStart(2, '0'); return (d.getFullYear() !== n.getFullYear() ? d.getFullYear() + '/' : '') + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + p(d.getMinutes()); };
+let histUrls = [];
+function renderHist() {
+  const box = $('#histCands'); box.textContent = ''; histUrls.forEach(u => URL.revokeObjectURL(u)); histUrls = [];
+  hist.forEach((h, i) => {
+    const w = document.createElement('div'); w.className = 'fav'; const b = document.createElement('button'); b.type = 'button'; b.className = 'cand';
+    b.innerHTML = '<span class="cand-frame"></span><span><span class="cand-name"></span><span class="cand-note"></span></span>';
+    if (h.thumb) { const im = new Image(), u = URL.createObjectURL(new Blob([h.thumb], {type: 'image/jpeg'})); histUrls.push(u); im.alt = ''; im.src = u; b.querySelector('.cand-frame').appendChild(im); }
+    b.querySelector('.cand-name').textContent = h.name; b.querySelector('.cand-note').textContent = dateText(h.t) + ' に保存';
+    b.addEventListener('click', () => openProject(h));
+    const d = document.createElement('button'); d.type = 'button'; d.className = 'x-del'; d.textContent = '×'; d.setAttribute('aria-label', `履歴「${h.name}」を消す`);
+    d.addEventListener('click', () => { hist.splice(i, 1); dbDel('projects', h.id).catch(() => {}); renderHist();
+      toolSay(`「${h.name}」を履歴から消しました。`, '元に戻す', () => { hist.splice(Math.min(i, hist.length), 0, h); dbPut('projects', h).catch(() => {}); renderHist(); toolSay('履歴に戻しました。'); }); kept = [h]; });
+    w.append(b, d); box.appendChild(w);
+  });
+  $('#histEmpty').hidden = hist.length > 0; box.hidden = !hist.length; $('#histFoot').hidden = !hist.length; $('#histClear').hidden = false; $('#histSure').hidden = true;
+  syncTools();
+}
+function wireTools() {
+  const sheet = $('#histSheet'), hb = $('#histBtn');
+  const show = on => { sheet.hidden = !on; hb.setAttribute('aria-expanded', on); };
+  $('#newBtn').addEventListener('click', startNew);
+  hb.addEventListener('click', () => { show(sheet.hidden); if (!sheet.hidden) sheet.scrollIntoView({block: 'nearest'}); });
+  $('#histClose').addEventListener('click', () => { show(false); hb.focus(); });
+  $('#undoBtn').addEventListener('click', () => { if (undo) undo(); });
+  $('#histClear').addEventListener('click', () => { $('#histClear').hidden = true; $('#histSure').hidden = false; $('#histClearNo').focus(); });
+  $('#histClearNo').addEventListener('click', () => { $('#histSure').hidden = true; $('#histClear').hidden = false; $('#histClear').focus(); });
+  $('#histClearYes').addEventListener('click', () => { // 確かめたうえで消すので、元には戻せない。使われなくなった画像も、その場で消す
+    const old = hist; hist = []; renderHist(); toolSay('履歴をすべて消しました。'); hb.focus();
+    dbDel('projects', old.map(h => h.id)).then(() => sweep(true)).catch(() => {});
+  });
+  arrowKeys($('#itemChips'));
+  const flush = () => { if (saveTimer) persist(); };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); }); window.addEventListener('pagehide', flush);
+}
+/* 開いたとき: 前回の作りかけ（画像）と履歴を読み込む */
+async function resume(wanted) {
+  let list = null; try { list = await dbAll('projects'); } catch (e) {}
+  if (list) {
+    hist = list.filter(r => r && typeof r.id === 'string' && r.id[0] === 'h' && r.text).sort((a, b) => b.t - a.t).slice(0, HIST_MAX);
+    const rec = list.find(r => r && r.id === 'draft');
+    if (rec && epoch === 0 && (ownImages(rec) || !rec.person || rec.person.adj)) {
+      const got = await loadImages(rec);
+      if (epoch === 0) {
+        setImages(rec, got); if (LAYOUTS[wanted].multi && multi()) S.layout = wanted;
+        syncSel(); syncTune(); buildSwatches(); syncMats(); refresh();
+        if (got.person || got.bg || got.extra.length) toolSay('前回の続きを開きました。' + (got.lost ? '一部の画像は残っていなかったので、入っていません。' : ''));
+      }
+    }
+  }
+  ready = true; lastDraft = list ? JSON.stringify(imageRefs()) : ''; renderHist(); if (list) sweep(false);
+}
+
 /* ================= 保存 ================= */
 const dlReady = (window.claude && typeof window.claude.use === 'function') ? Promise.resolve(window.claude.use('downloads')).catch(() => null) : Promise.resolve(null);
-const toBlob = (c, type, q) => new Promise(r => c.toBlob(r, type, q)), LIMIT = 2e6;
+const LIMIT = 2e6; // YouTubeのサムネは2MBまで
 let fbUrl = null;
 async function save() {
   const btn = $('#saveBtn'), msg = $('#saveMsg'); btn.disabled = true; msg.textContent = '画像を作っています…';
@@ -1629,29 +2236,32 @@ async function save() {
     const d = new Date(), p = n => String(n).padStart(2, '0');
     const name = `thumbnail-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.${ext}`;
     const kb = Math.round(blob.size / 1024), tail = `（${name}、${kb}KB${jpg ? '。PNGだと2MBを超えるのでJPGにしました' : ''}）`;
-    const dl = await dlReady; let done = false;
+    const dl = await dlReady; let done = false, out = false; // out: 画像を渡せた（＝履歴に残す）
     if (dl) {
-      try { await dl.save({filename: name, data: blob}); done = true; msg.textContent = '保存しました' + tail; $('#fallback').hidden = true; }
+      try { await dl.save({filename: name, data: blob}); done = out = true; msg.textContent = '保存しました' + tail; $('#fallback').hidden = true; }
       catch (e) { if (e && e.code === 'declined') { done = true; msg.textContent = '保存をやめました。'; } }
     }
     if (!done) {
       if (fbUrl) URL.revokeObjectURL(fbUrl); fbUrl = URL.createObjectURL(blob);
       $('#fallbackImg').src = fbUrl; $('#fallback').hidden = false;
       const a = document.createElement('a'); a.href = fbUrl; a.download = name; document.body.appendChild(a); a.click(); a.remove();
-      msg.textContent = '画像を用意しました' + tail;
+      out = true; msg.textContent = '画像を用意しました' + tail;
     }
+    if (out && await addHistory(c)) msg.textContent += '。履歴にも残しました。';
   } catch (e) { msg.textContent = '画像を作れませんでした。もう一度押してください。'; }
   btn.disabled = false;
 }
 
 /* ================= 起動 ================= */
 loadState();
-buildCands(); syncSel(); wire(); buildChips();
-S.person = prepPerson(makeSample()); S.layout = layoutNow(S.layout); syncSel(); syncTune(); buildSwatches(); buildEmphSwatches(); syncMats();
+const wanted = S.layout; // 前回の型（画像が戻ってから使う。ならべる型は画像が2枚ないと使えないため）
+buildCands(); buildItemCands(); syncSel(); wire(); wireVideo(); wireTools(); buildChips();
+S.person = prepPerson(makeSample()); S.layout = layoutNow(S.layout); syncSel(); syncTune(); buildSwatches(); buildEmphSwatches(); syncMats(); syncItems(); toolSay('');
 try { favs = cleanFavs(JSON.parse(localStorage.getItem(FAVS) || '[]')); } catch (e) {}
 renderFavs(); showWhere(); sync(false, false);
 refresh(); ensureFonts();
+resume(wanted).catch(() => { ready = true; });
 if (document.fonts) { document.fonts.ready.then(() => { resetMetrics(); refresh(); }); }
-if (location.hostname === 'localhost') window.__sk = {S, draw, THEMES, LAYOUTS, LAYOUT_ORDER, prepPerson, prepBg, refresh, parseMain, syncMats, buildSwatches, buildChips, imgs, imgsChanged, drawWith, get props() { return props; }, get favs() { return favs; }};
+if (location.hostname === 'localhost') window.__sk = {S, draw, THEMES, LAYOUTS, LAYOUT_ORDER, ITEMS, ITEM_ORDER, prepPerson, prepBg, refresh, parseMain, syncMats, buildSwatches, buildChips, imgs, imgsChanged, drawWith, addItem, syncItems, placed, itemStyle, imageRefs, persist, sweep, dbAll, dbKeys, get props() { return props; }, get favs() { return favs; }, get hist() { return hist; }, get ready() { return ready; }, get dbOk() { return dbOk; }, get lastItems() { return lastItems; }};
 })();
 </script>

@@ -6,7 +6,7 @@ const src = fs.readFileSync(path.join(root, 'src', 'samune-katagami.html'), 'utf
 const m = src.match(/^<title>([^<]*)<\/title>\s*(<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]*>)\s*<style>([\s\S]*?)<\/style>\s*([\s\S]*)$/);
 if (!m) throw new Error('src/samune-katagami.html の先頭の形（title → フォントの link → style）が変わっています');
 const [, title, fontLink, css, rest] = m;
-const desc = '人物・背景の画像と文字を入れると、配置の型と雰囲気（フォント＋配色）の候補が並び、選ぶだけで1280×720のサムネイルを作れるツール。画像はブラウザの中だけで処理されます。';
+const desc = '人物・背景の画像と文字を入れると、配置の型と雰囲気（フォント＋配色）の候補が並び、選ぶだけで1280×720のサムネイルを作れるツール。画像や動画はブラウザの中だけで処理されます。';
 const icon = "data:image/svg+xml," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M16 2v28M1 16h30' stroke='#131B36' stroke-width='1.4'/><rect x='4' y='8.5' width='24' height='15' fill='#FFDD33' stroke='#131B36' stroke-width='2.4'/></svg>");
 // ふつうのWebページとして要る下地
 const reset = `:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
@@ -19,8 +19,8 @@ const footCss = `
 `;
 const foot = `
   <footer class="foot">
-    <p>入れた画像は、このブラウザの中だけで処理します。外部には送信しません。</p>
-    <p>文字・設定・お気に入りは、次に開いたときのために、このブラウザに保存されます。</p>
+    <p>入れた画像や動画は、このブラウザの中だけで処理します。外部には送信しません。</p>
+    <p>作りかけの画像・文字・設定と、お気に入り・履歴は、次に開いたときのために、このブラウザに保存されます。履歴は「履歴」からいつでも消せます。</p>
     <p>フォントは Google Fonts の書体（SIL Open Font License）を使っています。</p>
   </footer>
 `;
