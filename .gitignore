@@ -1,0 +1,3 @@
+# Cloudflare の作業用フォルダと、手元で入れた道具は入れない
+.wrangler/
+node_modules/

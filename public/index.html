@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>サムネ型紙</title>
+<meta name="description" content="人物・背景の画像と文字を入れると、配置の型と雰囲気（フォント＋配色）の候補が並び、選ぶだけで1280×720のサムネイルを作れるツール。画像はブラウザの中だけで処理されます。">
+<meta property="og:title" content="サムネ型紙">
+<meta property="og:description" content="人物・背景の画像と文字を入れると、配置の型と雰囲気（フォント＋配色）の候補が並び、選ぶだけで1280×720のサムネイルを作れるツール。画像はブラウザの中だけで処理されます。">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#F1F4F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1730" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2032%2032'%3E%3Cpath%20d%3D'M16%202v28M1%2016h30'%20stroke%3D'%23131B36'%20stroke-width%3D'1.4'%2F%3E%3Crect%20x%3D'4'%20y%3D'8.5'%20width%3D'24'%20height%3D'15'%20fill%3D'%23FFDD33'%20stroke%3D'%23131B36'%20stroke-width%3D'2.4'%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+1+Code:wght@500&family=M+PLUS+1p:wght@900&family=Mochiy+Pop+One&family=Noto+Sans+JP:wght@900&family=M+PLUS+Rounded+1c:wght@900&family=Reggae+One&family=Shippori+Mincho+B1:wght@800&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+img{max-width:100%}
+/* レイアウト: 方眼紙の地に紙片を並べる。左に手順1→3を縦に積み、右に仕上がり(4)を留め置く */
+:root{
+  --paper:#F1F4F9; --grid:#DDE6F2; --sheet:#FFFFFF; --ink:#131B36; --ink-soft:#4F5B7D; --line:#C2CCDF;
+  --accent:#2146E4; --on-accent:#FFFFFF; --mark:#FFDD33; --on-mark:#1B1600;
+  --good:#0B7A54; --warn:#A14A00; --field:#FFFFFF; --well:#E8EDF5;
+  --f-display:"Dela Gothic One","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+  --f-mono:"M PLUS 1 Code",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0E1730; --grid:#18254A; --sheet:#152041; --ink:#EAF0FF; --ink-soft:#A9B6D8; --line:#30416D;
+    --accent:#93A9FF; --on-accent:#0B1330; --mark:#FFDD33; --on-mark:#1B1600;
+    --good:#5FD6AA; --warn:#F7B55C; --field:#0E1730; --well:#1B2850; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0E1730; --grid:#18254A; --sheet:#152041; --ink:#EAF0FF; --ink-soft:#A9B6D8; --line:#30416D;
+  --accent:#93A9FF; --on-accent:#0B1330; --mark:#FFDD33; --on-mark:#1B1600;
+  --good:#5FD6AA; --warn:#F7B55C; --field:#0E1730; --well:#1B2850; color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--ink); font:500 15px/1.65 var(--f-body);
+  background:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+button,input,textarea{font:inherit;color:inherit}
+h1,h2,p{margin:0}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.page{max-width:1480px;margin:0 auto;padding-inline:clamp(16px,2.4vw,32px);padding-block:24px 64px;display:grid;gap:20px}
+
+/* 見出し */
+.mast{display:grid;gap:6px}
+.mast-title{display:flex;align-items:center;gap:14px}
+.frame-mark{position:relative;width:46px;aspect-ratio:16/9;border:2px solid var(--ink);background:var(--mark);flex:none}
+.frame-mark::before,.frame-mark::after{content:"";position:absolute;background:var(--ink)}
+.frame-mark::before{left:-8px;right:-8px;top:50%;height:1px}
+.frame-mark::after{top:-8px;bottom:-8px;left:50%;width:1px}
+h1{font:400 clamp(26px,3.4vw,36px)/1.15 var(--f-display);letter-spacing:.02em}
+.mast-lead{color:var(--ink-soft);max-width:56em;text-wrap:pretty}
+
+.cols{display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:20px;align-items:start}
+.steps{display:grid;gap:20px;min-width:0}
+
+/* 紙片 */
+.sheet{background:var(--sheet);border:1.5px solid var(--ink);border-radius:4px;padding:18px clamp(14px,1.8vw,22px) 22px;display:grid;gap:16px;min-width:0}
+.step-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1.5px dashed var(--line)}
+.num{font:400 15px/1 var(--f-display);width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;flex:none;align-self:center}
+h2{font:900 19px/1.3 var(--f-body);letter-spacing:.01em}
+.step-hint{color:var(--ink-soft);font-size:13px;flex:1 1 16em;min-width:0}
+.num.short{width:auto;height:26px;padding:0 10px;border-radius:999px;font:900 12px/1 var(--f-body);letter-spacing:.06em;background:var(--mark);color:var(--on-mark);border-color:var(--on-mark)}
+h3{margin:0;font:900 15px/1.3 var(--f-body)}
+.sub-head{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap}
+.sub-head .btn{margin-left:auto}
+.sub-head .note{flex:1 1 12em;min-width:0;text-align:right}
+.sub-line{padding-top:14px;border-top:1.5px dashed var(--line)}
+.fav{position:relative;min-width:0;display:grid}
+.fav-save{display:grid;gap:8px;justify-items:start}
+.fav-form{display:flex;gap:8px;flex-wrap:wrap;align-items:center;width:100%}
+.fav-form input{flex:1 1 9em;min-width:0;border:1.5px solid var(--line);background:var(--field);border-radius:6px;padding:7px 10px;font-size:16px;line-height:1.4}
+.fav-form input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px var(--accent)}
+
+/* ボタン類 */
+.btn{appearance:none;border:1.5px solid var(--ink);background:var(--sheet);border-radius:6px;padding:7px 13px;font-weight:700;font-size:14px;line-height:1.4;cursor:pointer}
+.btn:hover{background:var(--well)}
+.btn.quiet{border-color:var(--line);font-weight:500;color:var(--ink-soft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-size:15px;padding:8px 18px}
+.step-head .btn.primary{margin-left:auto;align-self:center}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn[aria-pressed="true"],.btn[aria-checked="true"]{background:var(--ink);color:var(--sheet)}
+.seg{display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap}
+.seg-btns{display:inline-flex}
+.seg-btns .btn{border-radius:0;margin-left:-1.5px}
+.seg-btns .btn:first-child{border-radius:6px 0 0 6px;margin-left:0}
+.seg-btns .btn:last-child{border-radius:0 6px 6px 0}
+.seg-btns .btn:focus-visible{position:relative;z-index:1}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* 1 素材 */
+.mats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mat{display:grid;grid-template-columns:84px minmax(0,1fr);gap:12px;align-items:start;padding:10px;border:1.5px dashed var(--line);border-radius:6px}
+.mat.over{border-color:var(--accent);background:var(--well)}
+.mat-thumb{width:84px;height:84px;border-radius:4px;overflow:hidden;border:1px solid var(--line);
+  background:conic-gradient(var(--well) 25%,var(--sheet) 0 50%,var(--well) 0 75%,var(--sheet) 0) 0 0/16px 16px}
+.mat-thumb canvas{display:block;width:100%;height:100%}
+.mat-body{display:grid;gap:6px;min-width:0}
+.mat-wide{grid-column:1/-1;grid-template-columns:minmax(0,1fr)}
+.extras{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding-top:4px}
+.ex-list{display:contents}
+.ex{position:relative;width:64px;height:64px;border-radius:4px;border:1px solid var(--line);background:conic-gradient(var(--well) 25%,var(--sheet) 0 50%,var(--well) 0 75%,var(--sheet) 0) 0 0/16px 16px}
+.ex canvas{display:block;width:100%;height:100%;border-radius:4px}
+.x-del{position:absolute;right:-8px;top:-9px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--ink);background:var(--sheet);color:var(--ink);font:900 14px/1 var(--f-body);cursor:pointer;padding:0;display:grid;place-items:center}
+.x-del:hover{background:var(--well)}
+.mat-title{font-weight:900;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tag{font:500 11px/1 var(--f-mono);padding:4px 6px;border-radius:3px;background:var(--mark);color:var(--on-mark);letter-spacing:.02em}
+.mat-hint{font-size:12.5px;line-height:1.5;color:var(--ink-soft)}
+.mat-actions{display:flex;gap:6px;flex-wrap:wrap}
+.note{font-size:12.5px;color:var(--ink-soft);line-height:1.6}
+.err{color:var(--warn);font-weight:700}
+
+.fields{display:grid;gap:12px}
+.field{display:grid;gap:5px;min-width:0}
+.field label,.lab{font-weight:700;font-size:14px}
+.field small,.lab small{font-weight:500;color:var(--ink-soft);font-size:12px;margin-left:6px}
+.field input[type="text"],.field textarea{width:100%;border:1.5px solid var(--line);background:var(--field);border-radius:6px;padding:9px 11px;font-size:16px;line-height:1.5}
+.field textarea{resize:vertical;min-height:4.4em;font-weight:700}
+.field input[type="text"]:focus,.field textarea:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 2px var(--accent)}
+.row2{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;border:1.5px solid var(--line);background:var(--field);border-radius:999px;padding:4px 12px;font-weight:700;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--mark);color:var(--on-mark);border-color:var(--on-mark)}
+
+/* 2・3 候補 */
+.cands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 12px}
+.cands.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+.cand{appearance:none;background:none;border:0;padding:0;text-align:left;cursor:pointer;display:grid;gap:7px;min-width:0;align-content:start}
+.cand-frame{position:relative;display:block;aspect-ratio:16/9;border-radius:3px;background:var(--well);outline:1px solid var(--line);outline-offset:0}
+.cand-frame canvas{display:block;width:100%;height:100%;border-radius:3px}
+.cand:hover .cand-frame{outline:2px solid var(--ink-soft)}
+.cand[aria-checked="true"] .cand-frame{outline:3px solid var(--accent);outline-offset:2px}
+.cand:focus-visible{outline:none}
+.cand:focus-visible .cand-frame{outline:3px solid var(--accent);outline-offset:4px}
+.cand-name{font-weight:900;font-size:14px;line-height:1.35;display:block}
+.cand[aria-checked="true"] .cand-name{color:var(--accent)}
+.cand[aria-checked="true"] .cand-name::before{content:"✓ "}
+.cand-note{font-size:12px;line-height:1.45;color:var(--ink-soft);display:block}
+.cand-font{font:500 10.5px/1.4 var(--f-mono);color:var(--ink-soft);display:block;overflow-wrap:anywhere}
+.cand-top{display:flex;gap:4px 8px;align-items:center;flex-wrap:wrap}
+.flag{font:700 10.5px/1 var(--f-body);background:var(--mark);color:var(--on-mark);padding:4px 6px;border-radius:3px}
+
+.colors{display:grid;gap:16px;padding-top:14px;border-top:1.5px dashed var(--line)}
+.color-row{display:grid;gap:8px;min-width:0}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw{appearance:none;border:1.5px solid var(--line);background:var(--field);border-radius:999px;padding:5px 12px 5px 6px;font-weight:700;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;line-height:1.3}
+.sw.plain{padding-left:12px}
+.sw i{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:block;flex:none}
+.sw code{font:500 11.5px/1 var(--f-mono)}
+.sw[aria-checked="true"],.sw[data-on="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.sw input[type="color"]{width:24px;height:24px;padding:0;border:0;background:none;cursor:pointer;border-radius:50%}
+
+/* 4 仕上げ */
+.finish{position:sticky;top:calc(env(safe-area-inset-top, 0px) + 14px);max-height:calc(100vh - 28px);overflow:auto}
+.stage{position:relative;padding:12px}
+.stage canvas{display:block;width:100%;height:auto;aspect-ratio:16/9;background:var(--well);cursor:grab;touch-action:pan-y}
+.stage canvas.dragging{cursor:grabbing}
+.tombo{position:absolute;width:12px;height:12px;border:0 solid var(--ink)}
+.tombo.tl{left:0;top:0;border-right-width:1px;border-bottom-width:1px}
+.tombo.tr{right:0;top:0;border-left-width:1px;border-bottom-width:1px}
+.tombo.bl{left:0;bottom:0;border-right-width:1px;border-top-width:1px}
+.tombo.br{right:0;bottom:0;border-left-width:1px;border-top-width:1px}
+.stage-note{display:flex;gap:6px 14px;flex-wrap:wrap;align-items:baseline;font-size:12.5px;color:var(--ink-soft)}
+.mono{font:500 12px/1.4 var(--f-mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.quick{display:flex;gap:8px;flex-wrap:wrap}
+.check{display:grid;grid-template-columns:168px minmax(0,1fr);gap:14px;align-items:center;padding:12px;background:var(--well);border-radius:6px}
+.check canvas{display:block;width:168px;max-width:100%;height:auto;aspect-ratio:16/9;border-radius:6px}
+.check-body{display:grid;gap:6px;min-width:0}
+.pill{justify-self:start;font-weight:900;font-size:13px;line-height:1.3;padding:4px 10px;border-radius:999px;border:1.5px solid currentColor}
+.pill.good{color:var(--good)} .pill.warn{color:var(--warn)}
+.pill::before{content:"● ";font-size:9px;vertical-align:1px}
+.check-body p{font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
+details{border-top:1.5px dashed var(--line);padding-top:12px}
+details .seg{margin-top:12px}
+summary{cursor:pointer;font-weight:900;font-size:14px}
+.tune-grid{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;align-items:center;margin-top:12px;font-size:13.5px}
+.tune-grid label{font-weight:700}
+input[type="range"]{width:100%;accent-color:var(--accent)}
+.tune-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.recipe{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:12px 0 0;font-size:13px}
+.recipe dt{font-weight:700;color:var(--ink-soft)}
+.recipe dd{margin:0;font:500 12.5px/1.6 var(--f-mono);overflow-wrap:anywhere}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;border:1px solid var(--line);vertical-align:-1px;margin-right:4px}
+.save-msg{font-size:12.5px;line-height:1.55;color:var(--ink-soft)}
+.fallback{display:grid;gap:8px;padding:12px;border:1.5px solid var(--accent);border-radius:6px}
+.fallback img{display:block;width:100%;height:auto;border-radius:3px}
+
+@media (max-width: 1020px){
+  .cols{grid-template-columns:minmax(0,1fr)}
+  .finish{position:static;max-height:none;overflow:visible}
+}
+@media (max-width: 640px){
+  body{font-size:14.5px}
+  .mats,.row2{grid-template-columns:minmax(0,1fr)}
+  .cands,.cands.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #propCands{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 8px}
+  #propCands .cand-name{font-size:12.5px}
+  #propCands .cand-note{font-size:11px}
+  .check{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion: no-preference){
+  .cand-frame,.btn,.chip,.sw{transition:outline-color .12s,background-color .12s,box-shadow .12s}
+}
+
+.foot{display:grid;gap:2px;color:var(--ink-soft);font-size:12.5px;line-height:1.7;max-width:62em}
+.foot p{margin:0}
+</style>
+</head>
+<body>
+<noscript><p style="margin:16px;font:700 15px/1.6 sans-serif">このツールは、JavaScriptを有効にすると使えます。</p></noscript>
+<div class="page">
+  <header class="mast">
+    <div class="mast-title"><span class="frame-mark" aria-hidden="true"></span><h1>サムネ型紙</h1></div>
+    <p class="mast-lead">素材と文字を入れたら、並んだ候補から選ぶだけ。配置・フォント・色・文字の大きさは型が決めます。</p>
+  </header>
+
+  <div class="cols">
+    <main class="steps">
+
+      <section class="sheet" aria-labelledby="h-step1">
+        <div class="step-head"><span class="num" aria-hidden="true">1</span><h2 id="h-step1">素材と文字を入れる</h2></div>
+        <div class="mats">
+          <div class="mat" id="dropPerson">
+            <div class="mat-thumb"><canvas id="thumbPerson" width="168" height="168" aria-label="いまの人物画像"></canvas></div>
+            <div class="mat-body">
+              <div class="mat-title">人物<span class="tag" id="tagPerson">見本を表示中</span></div>
+              <p class="mat-hint" id="hintPerson">背景が透明なPNGなら、白フチ付きの切り抜きで入ります。</p>
+              <div class="mat-actions">
+                <button type="button" class="btn" id="pickPerson">画像を選ぶ</button>
+                <button type="button" class="btn quiet" id="nonePerson">人物なし</button>
+                <button type="button" class="btn quiet" id="resetPerson" hidden>見本に戻す</button>
+                <input type="file" id="filePerson" accept="image/*" hidden>
+              </div>
+            </div>
+          </div>
+          <div class="mat" id="dropBg">
+            <div class="mat-thumb"><canvas id="thumbBg" width="168" height="168" aria-label="いまの背景画像"></canvas></div>
+            <div class="mat-body">
+              <div class="mat-title">背景<span class="tag" id="tagBg">自動の背景</span></div>
+              <p class="mat-hint" id="hintBg">入れなければ、雰囲気に合う背景を自動で作ります。</p>
+              <div class="mat-actions">
+                <button type="button" class="btn" id="pickBg">画像を選ぶ</button>
+                <button type="button" class="btn quiet" id="clearBg" hidden>背景を外す</button>
+                <input type="file" id="fileBg" accept="image/*" hidden>
+              </div>
+            </div>
+          </div>
+          <div class="mat mat-wide" id="dropExtra">
+            <div class="mat-body">
+              <div class="mat-title">追加の画像<span class="tag">まとめ・コラボ用</span></div>
+              <p class="mat-hint" id="hintExtra">2枚目からの画像を入れると、画像をならべる型が選べます。</p>
+              <div class="extras">
+                <span class="ex-list" id="extraList"></span>
+                <button type="button" class="btn" id="pickExtra">画像を追加</button>
+                <input type="file" id="fileExtra" accept="image/*" multiple hidden>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="note" id="matNote">画像は枠にドラッグしても、コピーして貼り付け（Ctrl+V）しても入ります。画像はこのページの外へ送られません。</p>
+
+        <div class="fields">
+          <div class="field">
+            <label for="mainText">メインの文字<small>12文字くらいまでが読みやすい</small></label>
+            <textarea id="mainText" rows="2" spellcheck="false"></textarea>
+            <p class="note">改行は自動で入ります。自分で改行した位置はそのまま使います。</p>
+          </div>
+          <div class="field" id="emphField">
+            <span class="lab">目立たせる言葉<small>押すと色が変わり、少し大きくなります</small></span>
+            <div class="chips" id="emphChips"></div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label for="subText">サブの文字<small>なくてもOK</small></label>
+              <input type="text" id="subText" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="labelText">ラベル<small>30分、#12 など</small></label>
+              <input type="text" id="labelText" autocomplete="off">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sheet" aria-labelledby="h-quick">
+        <div class="step-head"><span class="num short" aria-hidden="true">近道</span><h2 id="h-quick">まとめて決める</h2><p class="step-hint">押すと、型・雰囲気・色が一度に決まります。あとから 2 と 3 で変えられます。</p></div>
+        <div class="sub-head"><h3 id="h-props">おまかせ3案</h3><button type="button" class="btn quiet" id="moreProps">ほかの案を見る</button></div>
+        <div class="cands" id="propCands" role="radiogroup" aria-labelledby="h-props"></div>
+        <div class="sub-head sub-line"><h3 id="h-favs">お気に入り</h3><span class="note" id="favWhere"></span></div>
+        <div class="cands four" id="favCands" role="radiogroup" aria-labelledby="h-favs"></div>
+        <p class="note" id="favEmpty">まだありません。「仕上げて保存」の「この設定をお気に入りに保存」を押すと、いまの組み合わせがここに並びます。</p>
+        <p class="note" id="favUndo" role="status" hidden><span id="favUndoText"></span> <button type="button" class="btn quiet" id="favUndoBtn">元に戻す</button></p>
+      </section>
+
+      <section class="sheet" aria-labelledby="h-step2">
+        <div class="step-head"><span class="num" aria-hidden="true">2</span><h2 id="h-step2">型をえらぶ</h2><p class="step-hint">文字の大きさと改行は、型ごとに自動で決まります。</p></div>
+        <div class="cands" id="layoutCands" role="radiogroup" aria-labelledby="h-step2"></div>
+      </section>
+
+      <section class="sheet" aria-labelledby="h-step3">
+        <div class="step-head"><span class="num" aria-hidden="true">3</span><h2 id="h-step3">雰囲気をえらぶ</h2><p class="step-hint">フォント・文字色・フチの色がセットで変わります。</p></div>
+        <div class="cands four" id="themeCands" role="radiogroup" aria-labelledby="h-step3"></div>
+        <div class="colors">
+          <div class="color-row">
+            <span class="lab" id="colorsLab">文字の色を変える<small id="colorsHint">推しの色にすると統一感が出ます</small></span>
+            <div class="swatches" id="swatches" role="radiogroup" aria-labelledby="colorsLab"></div>
+          </div>
+          <div class="color-row">
+            <span class="lab" id="emphLab">目立たせる言葉の色<small id="emphHint">雰囲気ごとに決まった色です</small></span>
+            <div class="swatches" id="emphSwatches" role="radiogroup" aria-labelledby="emphLab"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="sheet finish" aria-labelledby="h-step4">
+      <div class="step-head"><span class="num" aria-hidden="true">4</span><h2 id="h-step4">仕上げて保存</h2><button type="button" class="btn primary" id="saveBtn">画像を保存</button></div>
+      <div class="stage">
+        <i class="tombo tl"></i><i class="tombo tr"></i><i class="tombo bl"></i><i class="tombo br"></i>
+        <canvas id="big" width="1280" height="720" aria-label="仕上がりのプレビュー"></canvas>
+      </div>
+      <div class="stage-note"><span class="mono">1280 × 720 px ・ 16:9</span><span id="dragNote">人物はマウスでドラッグして動かせます。</span></div>
+      <p class="save-msg" id="saveMsg" role="status">PNGで保存します。2MBを超えるときはJPGに切り替えます。</p>
+      <div class="quick">
+        <button type="button" class="btn" id="tFlip" aria-pressed="false">人物を左右反転</button>
+        <button type="button" class="btn" id="tBlur" aria-pressed="false" hidden>背景をぼかす</button>
+        <button type="button" class="btn" id="tDeco" aria-pressed="false" hidden>模様を重ねる</button>
+      </div>
+      <div class="seg" id="dimSeg" role="radiogroup" aria-labelledby="dimLab" hidden>
+        <span class="lab" id="dimLab">背景の暗さ</span>
+        <span class="seg-btns"><button type="button" class="btn" role="radio" data-dim="0">そのまま</button><button type="button" class="btn" role="radio" data-dim="1">少し暗く</button><button type="button" class="btn" role="radio" data-dim="2">しっかり暗く</button></span>
+      </div>
+      <div class="check">
+        <canvas id="mini" width="336" height="189" aria-label="小さく表示したときの見え方"></canvas>
+        <div class="check-body">
+          <span class="pill good" id="legPill">小さくても読める</span>
+          <p id="legText">スマホの一覧では、このくらいの大きさで表示されます。右下は再生時間で隠れるので、文字を置いていません。</p>
+        </div>
+      </div>
+      <div class="fav-save">
+        <button type="button" class="btn" id="favOpen">この設定をお気に入りに保存</button>
+        <form class="fav-form" id="favForm" hidden>
+          <label class="lab" for="favName">お気に入りの名前</label>
+          <input type="text" id="favName" maxlength="24" autocomplete="off">
+          <button type="submit" class="btn">保存する</button>
+          <button type="button" class="btn quiet" id="favCancel">やめる</button>
+        </form>
+        <p class="note" id="favMsg" role="status" hidden></p>
+      </div>
+      <div class="fallback" id="fallback" hidden>
+        <p class="note"><strong>保存が始まらないときは</strong>、下の画像を右クリック（スマホは長押し）して保存してください。</p>
+        <img id="fallbackImg" alt="できあがったサムネイル" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">
+      </div>
+      <details id="tune">
+        <summary>位置と大きさを微調整する</summary>
+        <div class="seg" id="selSeg" role="radiogroup" aria-labelledby="selLab" hidden><span class="lab" id="selLab">動かす画像</span><span class="seg-btns" id="selBtns"></span></div>
+        <div class="tune-grid">
+          <label for="pZoom" id="labZoom">人物の大きさ</label><input type="range" id="pZoom" min="50" max="220" value="100">
+          <label for="pX" id="labX">人物の左右</label><input type="range" id="pX" min="-50" max="50" value="0">
+          <label for="pY" id="labY">人物の上下</label><input type="range" id="pY" min="-50" max="50" value="0">
+          <label for="tScale">文字の大きさ</label><input type="range" id="tScale" min="60" max="100" value="100">
+        </div>
+        <div class="tune-actions">
+          <button type="button" class="btn" id="tSmallP" aria-pressed="true">助詞を小さくする</button>
+          <button type="button" class="btn" id="tBadge" aria-pressed="true">再生時間の位置を表示</button>
+          <button type="button" class="btn quiet" id="tReset">位置と大きさを元に戻す</button>
+        </div>
+      </details>
+      <details id="recipeBox">
+        <summary>このサムネの設定値</summary>
+        <dl class="recipe" id="recipe"></dl>
+        <div class="tune-actions"><button type="button" class="btn" id="copyRecipe">設定値をコピー</button><span class="note" id="copyMsg" role="status"></span></div>
+      </details>
+    </aside>
+  </div>
+  <footer class="foot">
+    <p>入れた画像は、このブラウザの中だけで処理します。外部には送信しません。</p>
+    <p>文字・設定・お気に入りは、次に開いたときのために、このブラウザに保存されます。</p>
+    <p>フォントは Google Fonts の書体（SIL Open Font License）を使っています。</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const W = 1280, H = 720, MG = 48;
+const $ = (s, r = document) => r.querySelector(s);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const mk = (w, h) => { const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w)); c.height = Math.max(1, Math.round(h)); return c; };
+const rngOf = seed => { let a = seed >>> 0; return () => { a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+
+/* ================= 色 ================= */
+const hex2rgb = h => { h = h.replace('#', ''); if (h.length === 3) h = [...h].map(c => c + c).join(''); const n = parseInt(h, 16); return [n >> 16 & 255, n >> 8 & 255, n & 255]; };
+const rgb2hex = c => '#' + c.map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+function rgb2hsl([r, g, b]) {
+  r /= 255; g /= 255; b /= 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0, s = 0;
+  if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); h = (mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4) * 60; }
+  return [h, s, l];
+}
+function hsl2rgb([h, s, l]) {
+  h = (((h % 360) + 360) % 360) / 360;
+  if (!s) return [l * 255, l * 255, l * 255];
+  const q = l < .5 ? l * (1 + s) : l + s - l * s, p = 2 * l - q;
+  const f = t => { t = (t + 1) % 1; return t < 1 / 6 ? p + (q - p) * 6 * t : t < .5 ? q : t < 2 / 3 ? p + (q - p) * (2 / 3 - t) * 6 : p; };
+  return [f(h + 1 / 3) * 255, f(h) * 255, f(h - 1 / 3) * 255];
+}
+const hsl = (h, s, l) => rgb2hex(hsl2rgb([h, clamp(s, 0, 1), clamp(l, 0, 1)]));
+const lum = hex => { const [r, g, b] = hex2rgb(hex).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * r + .7152 * g + .0722 * b; };
+const mix = (a, b, t) => { const x = hex2rgb(a), y = hex2rgb(b); return rgb2hex(x.map((v, i) => v + (y[i] - v) * t)); };
+const rgba = (hex, a) => { const [r, g, b] = hex2rgb(hex); return `rgba(${r},${g},${b},${a})`; };
+
+/* ================= フォント ================= */
+const GOTHIC = '"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo","Noto Sans CJK JP",sans-serif';
+const MINCHO = '"Hiragino Mincho ProN","Yu Mincho","Noto Serif CJK JP",serif';
+const FONTS = {
+  noto: {fam: '"Noto Sans JP"', wt: 900, fb: GOTHIC, label: 'Noto Sans JP Black'},
+  rounded: {fam: '"M PLUS Rounded 1c"', wt: 900, fb: GOTHIC, label: 'M PLUS Rounded 1c Black'},
+  reggae: {fam: '"Reggae One"', wt: 400, fb: GOTHIC, label: 'Reggae One'},
+  mochiy: {fam: '"Mochiy Pop One"', wt: 400, fb: GOTHIC, label: 'Mochiy Pop One'},
+  shippori: {fam: '"Shippori Mincho B1"', wt: 800, fb: MINCHO, label: 'Shippori Mincho B1 ExtraBold'},
+  mplus: {fam: '"M PLUS 1p"', wt: 900, fb: GOTHIC, label: 'M PLUS 1p Black'},
+  dela: {fam: '"Dela Gothic One"', wt: 400, fb: GOTHIC, label: 'Dela Gothic One'},
+};
+const fontCss = (fk, px) => { const f = FONTS[fk]; return `${f.wt} ${px}px ${f.fam}, ${f.fb}`; };
+const mctx = mk(8, 8).getContext('2d');
+let wCache = new Map(), mCache = new Map();
+function tw(fk, text) {
+  const key = fk + '\u0001' + text; let v = wCache.get(key);
+  if (v === undefined) { mctx.font = fontCss(fk, 100); v = mctx.measureText(text).width / 100; wCache.set(key, v); }
+  return v;
+}
+/* 1文字ぶんの送り幅。全角の括弧・句読点・「！？」は、字のまわりの空きを詰める */
+const TIGHT_L = /[「『（【［〈《｛“‘]/, TIGHT_R = /[」』）】］〉》｝”’、。，．]/, TIGHT_B = /[！？・：；]/;
+let gCache = new Map(), rCache = new Map();
+function gm(fk, ch) {
+  const key = fk + '|' + ch; let g = gCache.get(key); if (g) return g;
+  mctx.font = fontCss(fk, 100); const m = mctx.measureText(ch); let adv = m.width / 100, off = 0;
+  const tl = TIGHT_L.test(ch), tr = TIGHT_R.test(ch), tb = TIGHT_B.test(ch);
+  if ((tl || tr || tb) && adv > .8 && typeof m.actualBoundingBoxRight === 'number') {
+    const l = -m.actualBoundingBoxLeft / 100, r = m.actualBoundingBoxRight / 100, pad = .07;
+    if (r - l > .04) { const nl = (tl || tb) ? Math.max(0, l - pad) : 0, nr = (tr || tb) ? Math.min(adv, r + pad) : adv; off = -nl; adv = nr - nl; }
+  }
+  g = {adv, off}; gCache.set(key, g); return g;
+}
+/* 描く単位に分ける: 和文は1字ずつ、英数字はまとめて（字間の調整を保つ） */
+function runsOf(fk, t, perChar) {
+  const key = fk + (perChar ? '|1|' : '|0|') + t; let out = rCache.get(key); if (out) return out;
+  out = []; let buf = '';
+  const flush = () => { if (buf) { out.push({t: buf, adv: tw(fk, buf), off: 0, n: [...buf].length}); buf = ''; } };
+  for (const ch of t) {
+    if (!perChar && /[\u0020-\u007E\u00A0-\u024F]/.test(ch)) { buf += ch; continue; }
+    flush(); const g = gm(fk, ch); out.push({t: ch, adv: g.adv, off: g.off, n: 1});
+  }
+  flush(); rCache.set(key, out); return out;
+}
+const resetMetrics = () => { wCache = new Map(); mCache = new Map(); gCache = new Map(); rCache = new Map(); };
+function fm(fk) {
+  let m = mCache.get(fk);
+  if (!m) { mctx.font = fontCss(fk, 200); const x = mctx.measureText('国永あア'); const a = (x.actualBoundingBoxAscent || 172) / 200, d = (x.actualBoundingBoxDescent || 16) / 200; m = {a, d, h: a + d}; mCache.set(fk, m); }
+  return m;
+}
+
+/* ================= 雰囲気（フォント＋配色のセット） =================
+   ink = {fill: 色 または [グラデの色…], st: [[色, 太さem]…]（内側から）, sh: [色, ぼかしem, xem, yem]} */
+const K = '#0A0A12';
+const THEMES = [
+  { id: 'teiban', name: '定番', use: '迷ったらこれ', font: 'noto', es: 1.14,
+    main: {fill: '#FFFFFF', st: [[K, .085]], sh: ['rgba(0,0,0,.5)', .02, .03, .045]},
+    emph: {fill: '#FFE600', st: [[K, .085]], sh: ['rgba(0,0,0,.5)', .02, .03, .045]},
+    sub: {fill: '#FFFFFF', st: [[K, .11]]}, chip: ['#FFE600', K],
+    panel: ['#1D2B7A', '#0F1746', '#FFE600'], gen: ['#3E6CFF', '#0F1B6C', 'rays', '#FFFFFF', .10],
+    tone: ['#000814', .14], scrim: '6,10,30', outline: ['#FFFFFF', 10] },
+  { id: 'bakusho', name: '爆笑', use: '笑える場面・ツッコミ', font: 'rounded', es: 1.14, tilt: -3,
+    main: {fill: '#FFE600', st: [['#D8001A', .075], ['#FFFFFF', .05]], sh: ['rgba(0,0,0,.55)', 0, .04, .055]},
+    emph: {fill: '#FF2A1A', st: [['#FFFFFF', .075], ['#7A0010', .05]], sh: ['rgba(0,0,0,.55)', 0, .04, .055]},
+    sub: {fill: '#FFFFFF', st: [['#D8001A', .12]]}, chip: ['#FFE600', '#B00016'],
+    panel: ['#FF4A2B', '#C8001A', '#FFE600'], gen: ['#FF6238', '#C2001F', 'focus', '#FFFFFF', .38],
+    tone: ['#1A0500', .10], scrim: '40,8,0', outline: ['#FFFFFF', 11] },
+  { id: 'zekkyo', name: '絶叫', use: '叫び・ホラー・ドッキリ', font: 'reggae', es: 1.16, jitter: .03,
+    main: {fill: '#FFFFFF', st: [['#B8001F', .08], ['#120003', .06]], sh: ['rgba(255,0,40,.6)', .24, 0, 0]},
+    emph: {fill: ['#FFF27A', '#FFB800'], st: [['#B8001F', .08], ['#120003', .06]], sh: ['rgba(255,0,40,.6)', .24, 0, 0]},
+    sub: {fill: '#FFFFFF', st: [['#7A0014', .13]]}, chip: ['#E3001B', '#FFFFFF'],
+    panel: ['#3A000C', '#0D0003', '#E3001B'], gen: ['#C4001F', '#150005', 'focus', '#000000', .5],
+    tone: ['#1A0006', .4], vig: ['#000000', .6], scrim: '18,0,4', outline: null, pshadow: ['rgba(255,0,40,.6)', 36, 0, 0] },
+  { id: 'kawaii', name: 'かわいい', use: 'ほのぼの・癒やし', font: 'mochiy', es: 1.12,
+    main: {fill: '#FF3F8E', st: [['#FFFFFF', .085], ['#FF3F8E', .03]], sh: ['rgba(190,30,95,.4)', 0, .03, .045]},
+    emph: {fill: '#FFF07A', st: [['#FF3F8E', .085], ['#FFFFFF', .05]], sh: ['rgba(190,30,95,.4)', 0, .03, .045]},
+    sub: {fill: '#FF3F8E', st: [['#FFFFFF', .15]]}, chip: ['#FF3F8E', '#FFFFFF'], chipR: 31,
+    panel: ['#FFE0EC', '#FFBBD6', '#FF3F8E'], gen: ['#FFF4F8', '#FFB0D0', 'dots', '#FFFFFF', .6],
+    tone: ['#FF8FBE', .10], scrim: '255,150,196', outline: ['#FFFFFF', 12] },
+  { id: 'emo', name: 'エモ', use: 'てぇてぇ・しんみり', font: 'shippori', es: 1, ls: .05, sizeMul: .9, soft: true,
+    main: {fill: '#FFFFFF', st: [['rgba(10,16,40,.85)', .03]], sh: ['rgba(8,14,46,.92)', .2, 0, .02]},
+    emph: {fill: '#FFE7A3', st: [['rgba(10,16,40,.85)', .03]], sh: ['rgba(8,14,46,.92)', .2, 0, .02]},
+    sub: {fill: '#FFFFFF', st: [['rgba(10,16,40,.8)', .06]]}, chip: ['rgba(255,255,255,.16)', '#FFFFFF'], chipLine: '#FFFFFF',
+    panel: ['#1B2260', '#0A0E2B', '#FFE7A3'], gen: ['#232A72', '#E98E7C', 'dusk', '#FFFFFF', .5],
+    tone: ['#0B1440', .32], vig: ['#050818', .55], scrim: '6,10,32', outline: null, pshadow: ['rgba(0,0,0,.5)', 40, 0, 12] },
+  { id: 'cool', name: 'クール', use: 'かっこいい場面・神プレイ', font: 'mplus', es: 1.14, skew: -.18,
+    main: {fill: ['#FFFFFF', '#A9EEFF'], st: [['#061A55', .08], ['#33D6FF', .035]], sh: ['rgba(0,200,255,.55)', .18, 0, 0]},
+    emph: {fill: ['#FFF9A8', '#FFC400'], st: [['#061A55', .08], ['#33D6FF', .035]], sh: ['rgba(0,200,255,.55)', .18, 0, 0]},
+    sub: {fill: '#FFFFFF', st: [['#061A55', .12]]}, chip: ['#33D6FF', '#061A55'], chipSkew: true,
+    panel: ['#0B2A8F', '#040A2C', '#33D6FF'], gen: ['#0E35B0', '#030824', 'speed', '#33D6FF', .55],
+    tone: ['#02103A', .32], scrim: '2,8,36', outline: ['#BFF3FF', 7], pshadow: ['rgba(0,200,255,.5)', 30, 0, 0] },
+  { id: 'soushu', name: '総集編', use: 'まとめ・◯選', font: 'dela', es: 1.12,
+    main: {fill: ['#FFFBC2', '#FFD91A', '#FF9D00'], st: [['#3B1200', .05], ['#FFFFFF', .04]], sh: ['rgba(0,0,0,.6)', 0, .04, .05]},
+    emph: {fill: '#FFFFFF', st: [['#3B1200', .045], ['#FF2A3C', .045]], sh: ['rgba(0,0,0,.6)', 0, .04, .05]},
+    sub: {fill: '#FFFFFF', st: [['#3B1200', .12]]}, chip: ['#D60019', '#FFFFFF'],
+    panel: ['#4A1272', '#1E0536', '#FFD91A'], gen: ['#8A25B5', '#1E0536', 'rays', '#FFD91A', .13],
+    tone: ['#12021F', .24], scrim: '14,4,28', outline: ['#FFFFFF', 10] },
+  { id: 'obi', name: '帯つき', use: '速報・お知らせ風', font: 'noto', es: 1, band: true, bandBg: '#FFE600', padX: .16, gap: .36,
+    main: {fill: K, st: [], sh: null}, emph: {fill: '#E3001B', st: [], sh: null},
+    sub: {fill: '#FFFFFF', st: [[K, .11]]}, chip: [K, '#FFE600'],
+    panel: ['#1B1E28', '#0A0B10', '#FFE600'], gen: ['#333949', '#0D1016', 'stripes', '#FFE600', .09],
+    tone: ['#000000', .2], scrim: '0,0,0', outline: ['#FFFFFF', 10] },
+];
+
+/* 文字の色になじむ「目立たせる色」。色相ごとに、相性のよい明るい色を決めてある */
+function accentOf(key, bright, pale) {
+  const [h, s, l] = rgb2hsl(hex2rgb(key));
+  if (s < .12) return pale ? '#FFEFA8' : '#FFE600';                     // 白・黒・グレー → 黄
+  const soft = pale || (bright && (l > .72 || (s < .6 && l > .58)));      // 淡い色には淡い色を合わせる
+  const pick = (hue, vivid, light) => hsl(hue, 1, soft ? light : vivid);
+  if (h >= 345 || h < 45) return pick(52, .6, .77);                       // 赤・オレンジ → 黄
+  if (h < 100) return bright ? pick(14, .56, .7) : pick(52, .6, .77);     // 黄・黄緑 → 朱色（茶色のフチなら黄）
+  if (h < 215) return pick(54, .6, .77);                                  // 緑・水色 → レモン
+  if (h < 250) return bright ? pick(322, .72, .84) : pick(186, .68, .82); // 青 → 水色（淡い青の文字ならピンク）
+  if (h < 290) return pick(322, .72, .84);                                // 紫 → ピンク
+  return pick(50, .62, .79);                                              // ピンク → やわらかい黄
+}
+const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
+const lastOf = f => Array.isArray(f) ? f[f.length - 1] : f;
+/* 目立たせる言葉のインク: フチは塗りの明るさで決める（明るい塗りに暗いフチ、濃い塗りに白フチ） */
+function emphInk(T, main, color, dark, alt) {
+  if (T.band || T.soft || !main.st.length) return Object.assign({}, main, {fill: color});
+  const pale = mix(color, '#FFFFFF', .55), fill = Array.isArray(main.fill) && pale !== color.toUpperCase() ? [pale, color] : color;
+  const w0 = main.st[0][1], w1 = (main.st[1] || [0, .05])[1];
+  if (lum(color) < .3) return {fill, st: [['#FFFFFF', w0], [dark, w1]], sh: main.sh};
+  for (const st of [main.st, alt]) if (st && st.length && /^#/.test(st[0][0]) && contrast(color, st[0][0]) >= 2.4) return {fill, st, sh: main.sh};
+  return {fill, st: [[dark, w0], ['#FFFFFF', w1]], sh: main.sh};
+}
+/* 帯の上で読める「目立たせる色」 */
+function bandEmph(key, dark) {
+  const [h] = rgb2hsl(hex2rgb(key)), L = lum(key);
+  if (L <= .3) return accentOf(key, false);
+  const [ah, as] = rgb2hsl(hex2rgb(accentOf(key, true)));
+  const cands = [];
+  if (as > .2 && !(ah >= 40 && ah <= 70)) cands.push(ah < 30 ? '#C4001A' : hsl(ah, .9, .38));
+  cands.push('#FFFFFF', '#C4001A', '#1A3FC4');
+  const far = c => { const [ch, cs] = rgb2hsl(hex2rgb(c)); const d = Math.abs(ch - h) % 360; return cs < .1 || Math.min(d, 360 - d) >= 40; };
+  return cands.find(c => contrast(c, key) >= (c === '#FFFFFF' ? 2 : 2.6) && far(c)) || dark;
+}
+/* 好きな1色から配色を組み立てる: 明るい色・淡い色は文字色に、濃い色・中間の色はフチ色に回す */
+function recolor(T, key) {
+  const [h, s, hl] = rgb2hsl(hex2rgb(key)), L = lum(key), bright = L >= .45 || (L >= .3 && hl >= .68);
+  const dark = hsl(h, Math.min(s, .7), .09), deep = hsl(h, Math.min(1, s * 1.05), .22), light = hsl(h, Math.min(1, s * 1.1), .8);
+  const R = Object.assign({}, T, {dark}), w = T.main.st.map(x => x[1]), sh = T.main.sh;
+  const grad = Array.isArray(T.main.fill), w0 = w[0] || .08, w1 = w[1] || .05;
+  if (T.band) {
+    R.bandBg = key;
+    R.main = {fill: L > .3 ? dark : '#FFFFFF', st: [], sh: null};
+    R.emph = {fill: bandEmph(key, dark), st: [], sh: null};
+  } else if (T.soft) {
+    R.emph = Object.assign({}, T.emph, {fill: accentOf(key, true, true)});
+  } else if (bright) {
+    R.main = {fill: grad ? [mix(key, '#FFFFFF', .6), key] : key, st: [[dark, w0], ['#FFFFFF', w1]], sh};
+    R.emph = emphInk(T, R.main, accentOf(key, true), dark);
+  } else {
+    R.main = {fill: grad ? ['#FFFFFF', mix(key, '#FFFFFF', .72)] : '#FFFFFF', st: [[key, w0], [L < .12 ? '#FFFFFF' : dark, w1]], sh};
+    R.emph = emphInk(T, R.main, accentOf(key, false), dark);
+  }
+  R.chip = [key, L > .36 ? dark : '#FFFFFF']; R.chipLine = null;
+  R.sub = T.soft ? T.sub : {fill: '#FFFFFF', st: [[bright ? dark : key, (T.sub.st[0] || [0, .12])[1]]]};
+  // 明るい色を文字にしたときの背景: 同じ系統の深い色にして文字を浮かせる（黄色系だけは濁るので反対側の色）
+  const deepBg = bright && !T.band && s >= .12;
+  const bh = !deepBg ? h : (h >= 40 && h <= 105) ? h + 195 : h + (h > 150 && h < 300 ? 10 : -6);
+  R.panel = deepBg ? [hsl(bh, .6, .26), hsl(bh, .7, .1), key] : [deep, dark, bright ? key : light];
+  R.gen = T.soft ? [hsl(bh, Math.min(s, .7), .28), hsl(bh + 40, Math.min(s, .7), .6), T.gen[2], '#FFFFFF', T.gen[4]]
+    : deepBg ? [hsl(bh, .62, .4), hsl(bh + 20, .7, .12), T.gen[2], T.gen[3] === '#000000' ? '#000000' : '#FFFFFF', T.gen[4]]
+    : [hsl(h, s * .9, .46), hsl(h + 18, s, .14), T.gen[2], T.gen[3] === '#000000' ? '#000000' : '#FFFFFF', T.gen[4]];
+  if (bright && s < .12) { R.gen = T.gen; R.panel = T.panel; } // 白い文字なら、背景は雰囲気のまま
+  R.scrim = hex2rgb(dark).map(Math.round).join(',');
+  if (T.outline && T.outline[0] !== '#FFFFFF') R.outline = [light, T.outline[1]];
+  if (T.pshadow && T.pshadow[1] > 28 && !T.soft) R.pshadow = [rgba(key, .6), T.pshadow[1], 0, 0];
+  if (T.vig && !T.soft) R.vig = [dark, T.vig[1]];
+  if (T.tone) R.tone = [dark, T.tone[1]];
+  return R;
+}
+/* 雰囲気 → 文字色の差し替え → 目立たせる色の差し替え、の順に重ねる */
+const baseTheme = id => { const base = THEMES.find(t => t.id === id) || THEMES[0]; return S.color ? recolor(base, S.color) : base; };
+/* 文字色から出す「目立たせる色」のほかの候補 */
+function emphChoices() {
+  if (!S.color) return [];
+  const [h, s, l] = rgb2hsl(hex2rgb(S.color)); if (s < .12) return [];
+  const L = lum(S.color), bright = L >= .45 || (L >= .3 && l >= .68);
+  let o = (h + 180) % 360; if (o > 56 && o < 110) o = 54; // 黄緑はどぎつくなるので黄色に寄せる
+  const opp = o >= 35 && o <= 56 ? hsl(o, 1, .58) : o < 170 && o >= 110 ? hsl(o, .85, .7) : o < 200 && o >= 170 ? hsl(o, 1, .66) : o < 290 && o >= 200 ? hsl(o, 1, .74) : o < 345 && o >= 290 ? hsl(o, 1, .7) : hsl(o, 1, .64);
+  return [['反対の色', opp], bright ? ['白', '#FFFFFF'] : ['同じ色', hsl(h, Math.max(s, .8), clamp(l, .5, .62))]];
+}
+const themeOf = id => { const T = baseTheme(id); return S.emphColor ? Object.assign({}, T, {emph: emphInk(T, T.main, S.emphColor, T.dark || K, T.emph.st)}) : T; };
+
+/* ================= 状態 ================= */
+const S = {
+  person: null, sample: true, bg: null,
+  main: '叫びすぎて\n喉が終わった', emph: new Set(['喉']), sub: 'ホラゲ配信まとめ', label: '30分',
+  layout: 'right', theme: 'teiban', color: null, emphColor: null, dim: 0,
+  extra: [], sel: 0, textScale: 1, blur: false, deco: false, badge: true, smallP: true,
+};
+/* 画像は「人物」1枚＋「追加の画像」3枚まで。位置と大きさは画像ごとに持つ */
+const newAdj = () => ({dx: 0, dy: 0, zoom: 1, flip: false}), SPARE = {adj: newAdj()};
+const imgs = () => (S.person ? [S.person] : []).concat(S.extra), multi = () => imgs().length >= 2;
+const target = () => (LAYOUTS[S.layout].multi && multi() ? imgs()[S.sel] : S.person) || SPARE; // いま動かす対象: ならべる型では選んだ画像、ほかの型では人物
+Object.defineProperty(S, 'adj', {get: () => target().adj, set: v => { target().adj = v; }});
+const STORE = 'samune-katagami-v1';
+function saveState() { try { localStorage.setItem(STORE, JSON.stringify({main: S.main, emph: [...S.emph], sub: S.sub, label: S.label, layout: S.layout, theme: S.theme, color: S.color, emphColor: S.emphColor, dim: S.dim})); } catch (e) {} }
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem(STORE) || 'null'); if (!d || typeof d.main !== 'string') return;
+    S.main = d.main; S.sub = String(d.sub || ''); S.label = String(d.label || ''); S.emph = new Set(Array.isArray(d.emph) ? d.emph : []);
+    if (LAYOUTS[d.layout]) S.layout = d.layout; if (THEMES.some(t => t.id === d.theme)) S.theme = d.theme;
+    const hex = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);
+    if (hex(d.color)) S.color = d.color; if (hex(d.emphColor)) S.emphColor = d.emphColor; if ([0, 1, 2].includes(d.dim)) S.dim = d.dim;
+  } catch (e) {}
+}
+
+/* ================= 文字の分解 =================
+   文節らしいかたまりに分けて、かたまりの間でだけ改行する */
+const SEG = (typeof Intl !== 'undefined' && Intl.Segmenter) ? new Intl.Segmenter('ja', {granularity: 'word'}) : null;
+const isHira = s => /^[ぁ-ゖー]+$/.test(s);
+const PARTICLE = new Set('は が を に で と も の へ や か ね よ な わ て って から まで より けど ので のに こそ さえ しか だけ など とか ほど には では とは にも でも への との での'.split(' '));
+const RE_OPEN = /^[（(「『【［\[〈《｛{“‘#＃@＠]+$/;
+const RE_TAIL = /^[、。，．,.!?！？…‥ー〜～・：:；;）)」』】］\]〉》｝}”’♪☆★]+$/;
+const RE_NOSTART = /^[、。，．,.!?！？…‥ー〜～・：:；;）)」』】］\]〉》｝}”’ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ々]/;
+const RE_SMALL = /^[ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮー]/;
+const RE_KATA = /^[\u30A1-\u30FAー]+$/;
+const AUX = new Set('すぎる すぎた すぎて される された させる できる できた られる られた ちゃう ちゃった まくる まくり まくった ている ていた でした ました だった なかった ません くない そうな みたい らしい っぽい'.split(' '));
+function rawSegs(s) {
+  if (SEG) return [...SEG.segment(s)].map(x => x.segment);
+  return s.match(/[\u4E00-\u9FFF々〆]+|[\u30A1-\u30FAー]+|[\u3041-\u3096]+|[A-Za-z0-9０-９Ａ-Ｚａ-ｚ]+|\s+|./gu) || [];
+}
+function tokensOf(s) {
+  const segs = rawSegs(s), toks = [];
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i], next = segs[i + 1] || '', prev = toks[toks.length - 1], prevW = prev && prev.kind === 'w';
+    if (/^\s+$/.test(seg)) { toks.push({t: ' ', kind: 's'}); continue; }
+    if (RE_OPEN.test(seg)) { if (prev && prev.kind === 'o') prev.t += seg; else toks.push({t: seg, kind: 'o'}); continue; }
+    if (prev && prev.kind === 'o') { prev.t += seg; prev.kind = 'w'; continue; } // 括弧は次の言葉から離さない
+    if (RE_TAIL.test(seg) && prev && prev.kind !== 's') { prev.t += seg; if (prevW) prev.tail = true; continue; } // 句読点や「！」は前の言葉へ
+    if (RE_SMALL.test(seg) && prev && prev.kind !== 's') { // 「っ」などで始まる断片は前の言葉の続き
+      const pp = toks[toks.length - 2];
+      if (prev.kind === 'p' && pp && pp.kind === 'w') { pp.t += prev.t + seg; toks.pop(); } else { prev.t += seg; prev.kind = 'w'; }
+      continue;
+    }
+    const open_ = prevW && !prev.tail; // 前の言葉にまだ続けられる
+    if (isHira(seg) && PARTICLE.has(seg) && open_ && !RE_SMALL.test(next) && !/^[\u3041-\u3096]$/.test(prev.t)) { toks.push({t: seg, kind: 'p'}); continue; }
+    if (isHira(seg) && (seg.length <= 2 || AUX.has(seg)) && open_ && /[\u3041-\u3096\u4E00-\u9FFF々]$/.test(prev.t)) { prev.t += seg; continue; } // 送りがな・助動詞
+    if (open_ && RE_KATA.test(seg) && /[\u30A1-\u30FAー]$/.test(prev.t)) { prev.t += seg; continue; } // カタカナ語は割らない
+    if (open_ && /^[\u4E00-\u9FFF々]$/.test(seg) && /[\u30A1-\u30FAー\u4E00-\u9FFF々]$/.test(prev.t)) { prev.t += seg; continue; } // 「配信＋中」
+    if (open_ && /^[\u4E00-\u9FFF々]$/.test(prev.t) && /^[\u4E00-\u9FFF々\u30A1-\u30FA]/.test(seg)) { prev.t += seg; continue; } // 「神＋プレイ」
+    if (open_ && /[0-9０-９]$/.test(prev.t) && /^[\u4E00-\u9FFF\u30A1-\u30FAー%％]{1,2}$/.test(seg)) { prev.t += seg; continue; } // 数字＋「分」「年」など
+    if (open_ && /^[0-9０-９]/.test(seg) && /^[第全約計各毎数]$/.test(prev.t)) { prev.t += seg; continue; }
+    toks.push({t: seg, kind: 'w'});
+  }
+  return toks;
+}
+function unitsOf(toks) {
+  const units = []; let cur = null, sp = false;
+  for (const tk of toks) {
+    if (tk.kind === 's') { sp = true; continue; }
+    if (tk.kind === 'p' && cur && !sp) { cur.parts.push({t: tk.t, key: null, e: false}); continue; }
+    cur = {parts: [{t: tk.t, key: tk.t, e: true}], sp, soft: false}; units.push(cur); sp = false;
+  }
+  // 区切れない長い言葉は、文字単位でも折り返せるようにする
+  const out = [];
+  for (const u of units) {
+    const p = u.parts[0], chars = [...p.t];
+    if (u.parts.length === 1 && chars.length >= 9) {
+      let first = true, buf = '';
+      const flush = () => { if (!buf) return; out.push({parts: [{t: buf, key: p.key, e: true}], sp: first ? u.sp : false, soft: !first}); first = false; buf = ''; };
+      chars.forEach((ch, i) => { if (i && !RE_NOSTART.test(ch) && !RE_OPEN.test(buf.slice(-1))) flush(); buf += ch; });
+      flush();
+    } else out.push(u);
+  }
+  return out;
+}
+let parsed = {text: null, groups: [], keys: []};
+function parseMain() {
+  if (parsed.text === S.main) return parsed;
+  const groups = [], keys = [];
+  for (const line of S.main.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    const us = unitsOf(tokensOf(line.trim()));
+    if (us.length) groups.push(us);
+    for (const u of us) for (const p of u.parts) if (p.e && !keys.includes(p.key) && /[^\s\p{P}\p{S}]/u.test(p.key)) keys.push(p.key);
+  }
+  parsed = {text: S.main, groups, keys};
+  return parsed;
+}
+
+/* ================= 素材 ================= */
+function analyze(c) {
+  const sc = Math.min(1, 220 / Math.max(c.width, c.height)), t = mk(c.width * sc, c.height * sc);
+  const tx = t.getContext('2d', {willReadFrequently: true}); tx.drawImage(c, 0, 0, t.width, t.height);
+  const d = tx.getImageData(0, 0, t.width, t.height).data, n = t.width * t.height;
+  let clear = 0, x0 = t.width, y0 = t.height, x1 = -1, y1 = -1;
+  const bins = Array.from({length: 24}, () => ({n: 0, r: 0, g: 0, b: 0})); let solid = 0;
+  for (let y = 0; y < t.height; y++) for (let x = 0; x < t.width; x++) {
+    const i = (y * t.width + x) * 4, a = d[i + 3];
+    if (a < 128) clear++;
+    if (a > 40) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (a > 200) {
+      solid++;
+      const [hh, ss, ll] = rgb2hsl([d[i], d[i + 1], d[i + 2]]);
+      if (ss < .3 || ll < .16 || ll > .88) continue;
+      if (hh > 8 && hh < 42 && ll > .58 && ss < .75) continue; // 肌色は拾わない
+      const b = bins[Math.floor(hh / 15) % 24]; b.n++; b.r += d[i]; b.g += d[i + 1]; b.b += d[i + 2];
+    }
+  }
+  const picked = [], colors = [];
+  bins.map((b, i) => ({b, i})).sort((p, q) => q.b.n - p.b.n).forEach(({b, i}) => {
+    if (colors.length >= 4 || b.n < solid * .02) return;
+    if (picked.some(j => Math.min(Math.abs(j - i), 24 - Math.abs(j - i)) < 2)) return;
+    picked.push(i);
+    const [hh, ss, ll] = rgb2hsl([b.r / b.n, b.g / b.n, b.b / b.n]);
+    colors.push(hsl(hh, Math.max(ss, .62), clamp(ll, .42, .66)));
+  });
+  const cutout = clear / n > .04 && x1 >= 0;
+  return {cutout, colors, box: {x: x0 / sc, y: y0 / sc, w: (x1 - x0 + 1) / sc, h: (y1 - y0 + 1) / sc}};
+}
+function prepPerson(c) {
+  const a = analyze(c); let base = c;
+  if (a.cutout) { // 透明な余白を切り落とす
+    const bx = Math.max(0, Math.floor(a.box.x) - 2), by = Math.max(0, Math.floor(a.box.y) - 2);
+    const bw = Math.min(c.width - bx, Math.ceil(a.box.w) + 4), bh = Math.min(c.height - by, Math.ceil(a.box.h) + 4);
+    const sc = Math.min(1, 1400 / Math.max(bw, bh));
+    base = mk(bw * sc, bh * sc); const x = base.getContext('2d'); x.imageSmoothingQuality = 'high'; x.drawImage(c, bx, by, bw, bh, 0, 0, base.width, base.height);
+  }
+  const cache = new Map();
+  return { base, w: base.width, h: base.height, cutout: a.cutout, colors: a.colors, adj: newAdj(),
+    outlined(color, r) { // 輪郭に沿ったフチ（シール風）
+      const key = color + r; let o = cache.get(key); if (o) return o;
+      const pad = r + 2, cv = mk(base.width + pad * 2, base.height + pad * 2), x = cv.getContext('2d');
+      const n = Math.max(16, Math.round(r * 2.2));
+      for (let ring = 1; ring <= (r > 10 ? 2 : 1); ring++) { const rr = r * ring / (r > 10 ? 2 : 1); for (let i = 0; i < n; i++) { const an = i / n * Math.PI * 2; x.drawImage(base, pad + Math.cos(an) * rr, pad + Math.sin(an) * rr); } }
+      x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, cv.width, cv.height);
+      x.globalCompositeOperation = 'source-over'; x.drawImage(base, pad, pad);
+      o = {c: cv, pad}; if (cache.size > 8) cache.clear(); cache.set(key, o); return o;
+    } };
+}
+function prepBg(c) {
+  const base = mk(W, H), x = base.getContext('2d'); x.imageSmoothingQuality = 'high';
+  const s = Math.max(W / c.width, H / c.height), dw = c.width * s, dh = c.height * s;
+  x.drawImage(c, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  let bl = null;
+  return { base, src: c, blurred() {
+    if (bl) return bl; bl = mk(W, H); const b = bl.getContext('2d'); b.imageSmoothingQuality = 'high';
+    if (typeof b.filter === 'string') { b.filter = 'blur(9px)'; b.drawImage(base, -24, -24, W + 48, H + 48); b.filter = 'none'; }
+    else { const t = mk(W / 12, H / 12), tx = t.getContext('2d'); tx.imageSmoothingQuality = 'high'; tx.drawImage(base, 0, 0, t.width, t.height); b.drawImage(t, 0, 0, W, H); }
+    return bl;
+  } };
+}
+async function fileToCanvas(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image(); img.src = url; await img.decode();
+    if (img.naturalWidth < 8 || img.naturalHeight < 8) throw new Error('size');
+    const sc = Math.min(1, 2200 / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = mk(img.naturalWidth * sc, img.naturalHeight * sc), x = c.getContext('2d'); x.imageSmoothingQuality = 'high';
+    x.drawImage(img, 0, 0, c.width, c.height); return c;
+  } finally { URL.revokeObjectURL(url); }
+}
+/* 見本の人物（オリジナルのイラスト） */
+function makeSample() {
+  const c = mk(900, 1000), x = c.getContext('2d');
+  const skin = '#FFE3D2', hair = '#34409A', hairDk = '#272F7A', hood = '#FF7B5A', hoodDk = '#E65B3C';
+  const path = fn => { x.beginPath(); fn(); x.closePath(); x.fill(); };
+  x.fillStyle = hairDk; // うしろ髪
+  path(() => { x.moveTo(190, 380); x.bezierCurveTo(120, 620, 160, 800, 250, 850); x.lineTo(650, 850); x.bezierCurveTo(740, 800, 780, 620, 710, 380); });
+  x.fillStyle = hood; // 肩
+  path(() => { x.moveTo(40, 1000); x.bezierCurveTo(50, 800, 190, 770, 330, 750); x.lineTo(570, 750); x.bezierCurveTo(710, 770, 850, 800, 860, 1000); });
+  x.fillStyle = hoodDk; // フード
+  path(() => { x.moveTo(250, 770); x.bezierCurveTo(300, 720, 600, 720, 650, 770); x.bezierCurveTo(600, 900, 300, 900, 250, 770); });
+  x.fillStyle = '#F5C9B4'; x.fillRect(388, 640, 124, 150); // 首
+  x.fillStyle = skin; x.beginPath(); x.ellipse(450, 440, 232, 246, 0, 0, Math.PI * 2); x.fill(); // 顔
+  x.fillStyle = hair; // 前髪
+  path(() => { x.moveTo(196, 470); x.bezierCurveTo(170, 230, 300, 140, 450, 140); x.bezierCurveTo(600, 140, 730, 230, 704, 470); x.bezierCurveTo(690, 380, 650, 330, 600, 300); x.bezierCurveTo(590, 350, 560, 380, 520, 390); x.bezierCurveTo(530, 350, 520, 320, 500, 300); x.bezierCurveTo(450, 370, 360, 400, 290, 392); x.bezierCurveTo(300, 370, 300, 350, 296, 330); x.bezierCurveTo(250, 360, 210, 400, 196, 470); });
+  x.strokeStyle = '#2A2140'; x.lineWidth = 15; x.lineCap = 'round'; x.lineJoin = 'round'; // 目 ＞＜
+  x.beginPath(); x.moveTo(300, 452); x.lineTo(372, 484); x.lineTo(300, 516); x.stroke();
+  x.beginPath(); x.moveTo(600, 452); x.lineTo(528, 484); x.lineTo(600, 516); x.stroke();
+  x.fillStyle = 'rgba(255,120,130,.42)'; x.beginPath(); x.ellipse(296, 560, 44, 26, 0, 0, 7); x.fill(); x.beginPath(); x.ellipse(604, 560, 44, 26, 0, 0, 7); x.fill();
+  x.fillStyle = '#7C1D2E'; x.beginPath(); x.ellipse(450, 588, 62, 70, 0, 0, 7); x.fill(); // 口
+  x.fillStyle = '#FF8C96'; x.beginPath(); x.ellipse(450, 628, 38, 26, 0, 0, 7); x.fill();
+  x.strokeStyle = '#FFFFFF'; x.lineWidth = 9; // ひも
+  x.beginPath(); x.moveTo(392, 850); x.lineTo(380, 960); x.stroke(); x.beginPath(); x.moveTo(508, 850); x.lineTo(520, 960); x.stroke();
+  return c;
+}
+
+/* ================= 描画の部品 ================= */
+function shadow(env, sh, size = 1) {
+  const {ctx, k} = env;
+  if (!sh) { ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0; return; }
+  ctx.shadowColor = sh[0]; ctx.shadowBlur = sh[1] * size * k; ctx.shadowOffsetX = sh[2] * size * k; ctx.shadowOffsetY = sh[3] * size * k;
+}
+function scrim(env, x0, y0, x1, y1, a0, a1) {
+  a0 *= env.f; a1 *= env.f; if (!a0 && !a1) return; // 画像を入れたときの暗さは「背景の暗さ」で決まる
+  const {ctx, T} = env, g = ctx.createLinearGradient(x0, y0, x1, y1);
+  g.addColorStop(0, `rgba(${T.scrim},${a0})`); g.addColorStop(1, `rgba(${T.scrim},${a1})`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+function pattern(env, kind, color, alpha, mul) {
+  const {ctx} = env, [cx, cy] = env.focus, rng = rngOf(11);
+  alpha = Math.min(1, alpha * mul); mul = 1;
+  ctx.save(); ctx.fillStyle = color;
+  if (kind === 'rays') {
+    ctx.globalAlpha = alpha * mul; const n = 16, R = 1800;
+    for (let i = 0; i < n; i++) { const a0 = i / n * Math.PI * 2 + .12, a1 = a0 + Math.PI / n; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a0) * R, cy + Math.sin(a0) * R); ctx.lineTo(cx + Math.cos(a1) * R, cy + Math.sin(a1) * R); ctx.closePath(); ctx.fill(); }
+  } else if (kind === 'focus') { // 集中線
+    ctx.globalAlpha = alpha * mul; const n = 120, R = 1800;
+    for (let i = 0; i < n; i++) { const a = (i + rng()) / n * Math.PI * 2, da = .004 + rng() * .017, r0 = 300 + rng() * 240; ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * r0 * 1.2, cy + Math.sin(a) * r0 * .82); ctx.lineTo(cx + Math.cos(a - da) * R, cy + Math.sin(a - da) * R); ctx.lineTo(cx + Math.cos(a + da) * R, cy + Math.sin(a + da) * R); ctx.closePath(); ctx.fill(); }
+  } else if (kind === 'dots') {
+    ctx.globalAlpha = alpha * mul; const sp = 58;
+    for (let j = -1; j < H / (sp * .87) + 2; j++) for (let i = -1; i < W / sp + 2; i++) { const x = i * sp + (j % 2 ? sp / 2 : 0), y = j * sp * .87, t = clamp(1 - Math.hypot(x - cx, y - cy) / 900, 0, 1); ctx.beginPath(); ctx.arc(x, y, 5 + (1 - t) * 15, 0, 7); ctx.fill(); }
+  } else if (kind === 'stripes') {
+    ctx.globalAlpha = alpha * mul; ctx.translate(W / 2, H / 2); ctx.rotate(-Math.PI / 5);
+    for (let x = -1300; x < 1300; x += 96) ctx.fillRect(x, -1300, 44, 2600);
+  } else if (kind === 'speed') {
+    ctx.translate(W / 2, H / 2); ctx.rotate(-.34);
+    for (let i = 0; i < 54; i++) { const y = (rng() - .5) * 1400, x = (rng() - .5) * 1900, len = 280 + rng() * 900, th = 2 + rng() * 9; ctx.globalAlpha = alpha * mul * (.2 + rng() * .8); ctx.fillRect(x, y, len, th); }
+  } else if (kind === 'dusk') { // 玉ボケ
+    for (let i = 0; i < 30; i++) { const x = rng() * W, y = rng() * H, r = 18 + rng() * 78, a = alpha * mul * (.18 + rng() * .5); const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, rgba(color, a * .7)); g.addColorStop(.8, rgba(color, a * .5)); g.addColorStop(1, rgba(color, 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); }
+  }
+  ctx.restore();
+}
+function vignette(env, color, alpha) {
+  const {ctx} = env, g = ctx.createRadialGradient(W / 2, H / 2, 240, W / 2, H / 2, 800);
+  g.addColorStop(0, rgba(color, 0)); g.addColorStop(1, rgba(color, alpha)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+function background(env) {
+  const {ctx, T} = env, [cx, cy] = env.focus, [c1, c2, kind, pc, pa] = T.gen;
+  if (S.bg) {
+    ctx.drawImage(S.blur ? S.bg.blurred() : S.bg.base, 0, 0, W, H);
+    if (T.tone && env.f) { ctx.fillStyle = rgba(T.tone[0], T.tone[1] * env.f); ctx.fillRect(0, 0, W, H); }
+    if (S.deco) pattern(env, kind, pc, pa, {rays: 1.6, focus: .8, dots: .5, stripes: 1.6}[kind] || 1);
+  } else {
+    let g;
+    if (kind === 'dusk') { g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, c1); g.addColorStop(.62, mix(c1, c2, .55)); g.addColorStop(1, c2); }
+    else if (kind === 'speed' || kind === 'stripes') { g = ctx.createLinearGradient(0, H, W, 0); g.addColorStop(0, c2); g.addColorStop(.55, c1); g.addColorStop(1, c2); }
+    else { g = ctx.createRadialGradient(cx, cy, 40, cx, cy, 980); g.addColorStop(0, c1); g.addColorStop(1, c2); }
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    pattern(env, kind, pc, pa, 1);
+  }
+  if (T.vig && (!S.bg || env.f)) vignette(env, T.vig[0], T.vig[1] * (S.bg ? env.f : .7));
+}
+function poly(ctx, pts) { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath(); }
+function cover(ctx, img, r, a) {
+  const s = Math.max(r.w / img.width, r.h / img.height) * a.zoom, dw = img.width * s, dh = img.height * s;
+  const x = r.x + (r.w - dw) / 2 + a.dx * W, y = r.y + (r.h - dh) / 2 + a.dy * H;
+  ctx.save(); if (a.flip) { ctx.translate(x + dw / 2, 0); ctx.scale(-1, 1); ctx.translate(-(x + dw / 2), 0); }
+  ctx.drawImage(img, x, y, dw, dh); ctx.restore();
+}
+const bucket = r => { const b = [3, 4, 6, 8, 11, 15, 20, 27, 36]; return b.reduce((p, c) => Math.abs(c - r) < Math.abs(p - r) ? c : p, b[0]); };
+/* 人物: 切り抜き画像は領域いっぱいに、四角い画像は枠付きで置く */
+function person(env, R, frame, photoRect, P = S.person, show = .36) {
+  const {ctx, T} = env; if (!P) return;
+  const a = P.adj;
+  if (P.cutout) {
+    const wide = P.w / P.h > R.w / R.h, sc0 = Math.max(R.w / P.w, R.h / P.h);
+    let s = (wide ? Math.min(sc0, 1.1 * R.w / P.w) : Math.min(sc0, R.h / (show * P.h))) * a.zoom; // 縦長の画像は、上から show の割合までは必ず見せる
+    const dw = P.w * s, dh = P.h * s, x = R.x + (R.w - dw) / 2 + a.dx * W;
+    const y = (dh >= R.h ? R.y + 16 : R.y + R.h - dh) + a.dy * H;
+    let img = P.base, pad = 0;
+    if (T.outline) { const o = P.outlined(T.outline[0], bucket(T.outline[1] / s)); img = o.c; pad = o.pad; }
+    ctx.save(); shadow(env, T.pshadow || ['rgba(0,0,0,.42)', 26, 0, 10]);
+    if (a.flip) { ctx.translate(x + dw / 2, 0); ctx.scale(-1, 1); ctx.translate(-(x + dw / 2), 0); }
+    ctx.drawImage(img, x - pad * s, y - pad * s, img.width * s, img.height * s); ctx.restore();
+    return;
+  }
+  const line = (T.outline && T.outline[0]) || '#FFFFFF';
+  if (frame === 'full') { cover(ctx, P.base, {x: 0, y: 0, w: W, h: H}, a); return; }
+  if (frame === 'photo') {
+    const rr = photoRect || R, w = Math.min(rr.w, rr.h * 1.6), h = w / 1.6, x = rr.x + (rr.w - w) / 2, y = rr.y + (rr.h - h) / 2;
+    ctx.save(); ctx.translate(x + w / 2, y + h / 2); ctx.rotate(-.035); ctx.translate(-(x + w / 2), -(y + h / 2));
+    ctx.save(); shadow(env, ['rgba(0,0,0,.5)', 30, 0, 14]); ctx.fillStyle = line; ctx.fillRect(x - 12, y - 12, w + 24, h + 24); ctx.restore();
+    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip(); cover(ctx, P.base, {x, y, w, h}, a); ctx.restore(); return;
+  }
+  // 斜めに切った枠
+  const pts = Array.isArray(frame) ? frame : frame === 'slantL' ? [[0, 0], [R.x + R.w - 120, 0], [R.x + R.w + 10, H], [0, H]] : [[R.x + 120, 0], [W, 0], [W, H], [R.x - 10, H]];
+  const xs = pts.map(p => p[0]), bx = Math.min(...xs), bw = Math.max(...xs) - bx;
+  ctx.save(); poly(ctx, pts); ctx.clip(); cover(ctx, P.base, {x: bx, y: 0, w: bw, h: H}, a); ctx.restore();
+  const e = frame === 'slantL' ? [pts[1], pts[2]] : [pts[0], pts[3]];
+  ctx.save(); shadow(env, ['rgba(0,0,0,.45)', 22, frame === 'slantL' ? 6 : -6, 0]); ctx.strokeStyle = line; ctx.lineWidth = 12;
+  ctx.beginPath(); ctx.moveTo(e[0][0], e[0][1] - 20); ctx.lineTo(e[1][0], e[1][1] + 20); ctx.stroke(); ctx.restore();
+}
+
+/* 1コマぶんの画像: 四角い画像は枠いっぱいに、切り抜きは枠の中に立たせる */
+function cellImage(env, P, i, pts, fit, clip, show) {
+  const {ctx} = env; ctx.save();
+  if (clip || !P.cutout) { poly(ctx, pts); ctx.clip(); }
+  if (P.cutout) person(env, fit, null, null, P, show); else cover(ctx, P.base, fit, P.adj);
+  ctx.restore(); env.hits.push({i, pts});
+}
+function seam(env, a, b) { // コマの境目の線
+  const {ctx, T} = env; ctx.save(); shadow(env, ['rgba(0,0,0,.4)', 16, 0, 0]);
+  ctx.strokeStyle = (T.outline && T.outline[0]) || '#FFFFFF'; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]); ctx.stroke(); ctx.restore();
+}
+/* 文字の描画: 影→フチ（外から内）→塗り の順に重ねる */
+function fillOf(env, o) {
+  const f = o.ink.fill; if (!Array.isArray(f)) return f;
+  const g = env.ctx.createLinearGradient(0, -env.M.a * o.size - (o.py || 0), 0, env.M.d * o.size - (o.py || 0));
+  f.forEach((c, i) => g.addColorStop(i / (f.length - 1), c)); return g;
+}
+function paint(env, ops) {
+  const {ctx, T} = env;
+  const each = fn => { for (const o of ops) {
+    ctx.save(); ctx.translate(o.x + (o.cx || 0), o.y + (o.py || 0)); if (o.rot) ctx.rotate(o.rot); if (o.skew) ctx.transform(1, 0, o.skew, 1, 0, 0); if (o.sx) ctx.scale(o.sx, 1);
+    ctx.font = fontCss(T.font, o.size); ctx.textAlign = o.align || 'left'; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round'; ctx.miterLimit = 2;
+    fn(o, (o.dx || 0) - (o.cx || 0), (o.dy || 0) - (o.py || 0)); ctx.restore();
+  } };
+  const total = (st, i) => { let c = 0; for (let j = 0; j <= i; j++) c += st[j][1]; return c; };
+  const halo = T.soft && env.bare ? 3 : 1; // 暗くしない背景の上では、文字のまわりの影を濃くする
+  for (let n = 0; n < halo; n++) each((o, x, y) => { const st = o.ink.st || []; if (!o.ink.sh) return; shadow(env, o.ink.sh, o.size);
+    if (st.length) { ctx.lineWidth = total(st, st.length - 1) * 2 * o.size; ctx.strokeStyle = st[st.length - 1][0]; ctx.strokeText(o.t, x, y); }
+    else { ctx.fillStyle = fillOf(env, o); ctx.fillText(o.t, x, y); } });
+  for (let i = 2; i >= 0; i--) each((o, x, y) => { const st = o.ink.st || []; if (!st[i]) return; ctx.lineWidth = total(st, i) * 2 * o.size; ctx.strokeStyle = st[i][0]; ctx.strokeText(o.t, x, y); });
+  each((o, x, y) => { ctx.fillStyle = fillOf(env, o); ctx.fillText(o.t, x, y); });
+}
+/* 改行位置を決める: 候補を総当たりして、いちばん小さい行がいちばん大きくなる分け方を採る */
+const PARTICLE_SCALE = .78; // 助詞は小さくして、言葉のほうを目立たせる
+const partScale = (env, p) => p.em ? env.T.es : (!p.e && S.smallP) ? PARTICLE_SCALE : 1;
+function partW(env, p) {
+  let w = 0; for (const r of runsOf(env.T.font, p.t, env.perChar)) w += r.adv + (env.T.ls || 0) * r.n;
+  return w * partScale(env, p);
+}
+function choose(env, groups, box, o) {
+  const {T, M} = env;
+  const gi = groups.map(g => g.map(u => { let w = 0, em = false; for (const p of u.parts) { p.em = p.e && S.emph.has(p.key); if (p.em) em = true; w += partW(env, p); } return {u, w, em}; }));
+  const bounds = []; gi.forEach((g, a) => { for (let b = 1; b < g.length; b++) bounds.push([a, b, g[b].u.soft ? 1 : 0]); });
+  let extra = Math.max(0, o.lines - groups.length); if (bounds.length > 26) extra = Math.min(extra, 2);
+  const skewX = T.skew ? Math.abs(T.skew) * M.a : 0, pad2 = 2 * (T.padX || 0), gap = T.gap || .18;
+  let best = null;
+  const test = pick => {
+    const lines = []; let soft = 0;
+    gi.forEach((g, a) => { let st = 0; for (const bi of pick) { const b = bounds[bi]; if (b[0] !== a) continue; lines.push(g.slice(st, b[1])); st = b[1]; soft += b[2]; } lines.push(g.slice(st)); });
+    const ws = [], hf = [];
+    for (const ln of lines) { let w = 0, em = false; ln.forEach((it, i) => { if (i && it.u.sp) w += .3; w += it.w; if (it.em) em = true; }); const sc = em ? T.es : 1; ws.push(w + skewX * sc + pad2); hf.push(M.h * sc); }
+    let sizes;
+    if (o.style === 'uniform') { const s = Math.min(box.w / Math.max(...ws), o.max || 230); sizes = ws.map(() => s); }
+    else { sizes = ws.map(w => Math.min(box.w / w, o.max || 300)); const mn = Math.min(...sizes); sizes = sizes.map(s => Math.min(s, mn * (o.ratio || 1.7))); }
+    let tot = 0; sizes.forEach((s, i) => { tot += s * hf[i]; if (i) tot += gap * Math.min(s, sizes[i - 1]); });
+    if (tot > box.h) { const f = box.h / tot; sizes = sizes.map(s => s * f); }
+    const px = ws.map((w, i) => w * sizes[i]);
+    let score = Math.min(...sizes) * Math.pow(.8, soft) * (1 + .03 * Math.min(...px) / Math.max(...px));
+    if (o.style === 'uniform') score *= 1 - .1 * pick.length;
+    if (!best || score > best.score) best = {score, lines, ws, hf, sizes};
+  };
+  const rec = (start, pick) => { test(pick); if (pick.length >= extra) return; for (let i = start; i < bounds.length; i++) { pick.push(i); rec(i + 1, pick); pick.pop(); } };
+  rec(0, []);
+  return best;
+}
+function block(env, groups, box, o) {
+  const {ctx, T, M} = env; if (!groups.length) return null;
+  const tilt = o.noTilt ? 0 : T.tilt, bx = tilt ? {x: box.x + box.w * .02, y: box.y + box.h * .04, w: box.w * .95, h: box.h * .92} : box;
+  const b = choose(env, groups, bx, o), gap = T.gap || .18, mul = (T.sizeMul || 1) * S.textScale;
+  const sizes = b.sizes.map(s => s * mul);
+  let tot = 0; sizes.forEach((s, i) => { tot += s * b.hf[i]; if (i) tot += gap * Math.min(s, sizes[i - 1]); });
+  let y = o.valign === 'bottom' ? bx.y + bx.h - tot : o.valign === 'top' ? bx.y : bx.y + (bx.h - tot) / 2;
+  const rows = b.lines.map((ln, i) => {
+    const s = sizes[i], w = b.ws[i] * s, h = s * b.hf[i], sc = b.hf[i] / M.h;
+    const x = o.align === 'right' ? bx.x + bx.w - w : o.align === 'center' ? bx.x + (bx.w - w) / 2 : bx.x;
+    const r = {ln, s, x, w, top: y, h, base: y + M.a * s * sc}; y += h + (i < sizes.length - 1 ? gap * Math.min(s, sizes[i + 1]) : 0); return r;
+  });
+  const ops = [], jr = T.jitter ? rngOf(5) : null;
+  for (const r of rows) {
+    let x = r.x + (T.padX || 0) * r.s;
+    r.ln.forEach((it, i) => {
+      if (i && it.u.sp) x += .3 * r.s;
+      for (const p of it.u.parts) {
+        const sz = r.s * partScale(env, p), ink = p.em ? T.emph : T.main, ls = (T.ls || 0) * sz;
+        for (const g of runsOf(T.font, p.t, env.perChar)) {
+          const adv = g.adv * sz + ls * g.n;
+          if (jr) ops.push({t: g.t, x: x + ls / 2, cx: g.adv * sz / 2, dx: g.off * sz, y: r.base + (jr() - .5) * 2 * T.jitter * sz, py: -.38 * sz, size: sz, ink, rot: (jr() - .5) * .1});
+          else ops.push({t: g.t, x: x + ls / 2, dx: g.off * sz, y: r.base, size: sz, ink, skew: T.skew});
+          x += adv;
+        }
+      }
+    });
+  }
+  ctx.save();
+  if (tilt) { const cx = bx.x + bx.w / 2, cy = bx.y + bx.h / 2; ctx.translate(cx, cy); ctx.rotate(tilt * Math.PI / 180); ctx.translate(-cx, -cy); }
+  if (T.band) { ctx.save(); shadow(env, ['rgba(0,0,0,.38)', 0, 7, 9]); ctx.fillStyle = T.bandBg; for (const r of rows) ctx.fillRect(r.x, r.top - .1 * r.s, r.w, r.h + .2 * r.s); ctx.restore(); }
+  paint(env, ops); ctx.restore();
+  env.info.sizes.push(...sizes);
+  return rows;
+}
+const mainText = (env, box, o) => block(env, parseMain().groups, box, o);
+/* 上と下に分ける型 */
+function splitText(env, topBox, botBox) {
+  const groups = parseMain().groups; if (!groups.length) return;
+  const to = {style: 'uniform', lines: 1, align: 'left', valign: 'top', max: 150}, bo = {style: 'uniform', lines: 2, align: 'left', valign: 'bottom', max: 210};
+  let top = null, bot;
+  if (groups.length >= 2) { top = [groups[0]]; bot = groups.slice(1); bo.lines = Math.max(2, bot.length); }
+  else {
+    const g = groups[0]; bot = [g]; let best = 0;
+    for (let i = 1; i < g.length; i++) {
+      const a = choose(env, [g.slice(0, i)], topBox, to).sizes[0], b = choose(env, [g.slice(i)], botBox, bo).sizes[0];
+      const sc = Math.min(a, b) * (g[i].soft ? .8 : 1) * (1 + .1 * Math.min(a, b) / Math.max(a, b));
+      if (sc > best) { best = sc; top = [g.slice(0, i)]; bot = [g.slice(i)]; }
+    }
+  }
+  if (top) block(env, top, topBox, to);
+  block(env, bot, botBox, bo);
+}
+/* 縦書き */
+const V_ROT = /[ー〜～—―…‥\-－=＝:：;；（）()「」『』【】［］\[\]〈〉《》｛｝{}<>＜＞→←~]/, V_SMALL = /[ぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮヵヶ]/, V_PUNC = /[、。，．]/, V_TCY = /[0-9A-Za-z０-９!?！？]/;
+function cellsOf(units) {
+  const cells = [];
+  for (const u of units) for (const p of u.parts) {
+    const ch = [...p.t], sc = (!p.e && S.smallP) ? PARTICLE_SCALE : 1; let i = 0;
+    while (i < ch.length) {
+      if (V_TCY.test(ch[i])) { let j = i; while (j < ch.length && V_TCY.test(ch[j])) j++; const run = ch.slice(i, j); if (run.length <= 3) cells.push({t: run.join(''), k: 't', em: p.em, sc}); else run.forEach(c => cells.push({t: c, k: 'n', em: p.em, sc})); i = j; continue; }
+      cells.push({t: ch[i], k: V_ROT.test(ch[i]) ? 'r' : V_SMALL.test(ch[i]) ? 's' : V_PUNC.test(ch[i]) ? 'p' : 'n', em: p.em, sc}); i++;
+    }
+  }
+  return cells;
+}
+function verticalText(env, box) {
+  const {ctx, T, M} = env, groups = parseMain().groups; if (!groups.length) return;
+  for (const g of groups) for (const u of g) for (const p of u.parts) p.em = p.e && S.emph.has(p.key);
+  const cp = 1.03, colP = T.band ? 1.46 : 1.28;
+  const bounds = []; groups.forEach((g, a) => { for (let b = 1; b < g.length; b++) bounds.push([a, b, g[b].soft ? 1 : 0]); });
+  let extra = Math.max(0, 3 - groups.length); if (bounds.length > 26) extra = Math.min(extra, 2);
+  let best = null;
+  const test = pick => {
+    const cols = []; let soft = 0;
+    groups.forEach((g, a) => { let st = 0; for (const bi of pick) { const b = bounds[bi]; if (b[0] !== a) continue; cols.push(cellsOf(g.slice(st, b[1]))); st = b[1]; soft += b[2]; } cols.push(cellsOf(g.slice(st))); });
+    const len = cols.map(c => c.reduce((a, x) => a + x.sc, 0)), n = cols.length, mx = Math.max(...len), mnc = Math.min(...len);
+    const s = Math.min(box.h / (mx * cp), box.w / (n * colP - (colP - 1)), 230);
+    const score = s * Math.pow(.8, soft) * (1 + .04 * mnc / mx);
+    if (!best || score > best.score) best = {score, cols, s};
+  };
+  const rec = (start, pick) => { test(pick); if (pick.length >= extra) return; for (let i = start; i < bounds.length; i++) { pick.push(i); rec(i + 1, pick); pick.pop(); } };
+  rec(0, []);
+  const s = best.s * (T.sizeMul || 1) * S.textScale, n = best.cols.length, totW = (n * colP - (colP - 1)) * s;
+  const ops = [], jr = T.jitter ? rngOf(5) : null;
+  if (T.band) { ctx.save(); shadow(env, ['rgba(0,0,0,.38)', 0, 7, 9]); ctx.fillStyle = T.bandBg; best.cols.forEach((col, i) => { const cx = box.x + totW - s / 2 - i * colP * s; ctx.fillRect(cx - s * .64, box.y - s * .08, s * 1.28, col.reduce((a, x) => a + x.sc, 0) * cp * s + s * .16); }); ctx.restore(); }
+  best.cols.forEach((col, i) => {
+    const cx = box.x + totW - s / 2 - i * colP * s; let yy = box.y;
+    col.forEach(c => {
+      const z = s * c.sc, cy = yy + cp * z / 2, off = (M.a - M.d) / 2 * z, ink = c.em ? T.emph : T.main, base = {t: c.t, size: z, ink, align: 'center'}; yy += cp * z;
+      const jx = jr ? (jr() - .5) * 2 * T.jitter * z : 0, rot = jr ? (jr() - .5) * .1 : 0;
+      if (c.k === 'r') ops.push(Object.assign(base, {x: cx, y: cy, rot: Math.PI / 2, dy: off}));
+      else if (c.k === 's') ops.push(Object.assign(base, {x: cx + .1 * z + jx, y: cy + off - .1 * z, py: -off, rot}));
+      else if (c.k === 'p') ops.push(Object.assign(base, {x: cx + .56 * z, y: cy + off - .56 * z}));
+      else if (c.k === 't') { const w = tw(T.font, c.t) * z; ops.push(Object.assign(base, {x: cx + jx, y: cy + off, py: -off, rot, sx: Math.min(1, .98 * z / w)})); }
+      else ops.push(Object.assign(base, {x: cx + jx, y: cy + off, py: -off, rot}));
+    });
+  });
+  paint(env, ops);
+  env.info.sizes.push(s); env.info.vertical = true;
+}
+/* ラベルとサブの文字 */
+function head(env, x, y, maxW, align) {
+  const {ctx, T, M} = env, lab = S.label.trim(), sub = S.sub.trim(); if (!lab && !sub) return 0;
+  const hgt = HEAD, gap = 16; let fs = 38, pad = 20;
+  let chipW = lab ? tw(T.font, lab) * fs + pad * 2 : 0;
+  if (chipW > maxW * .6) { const f = maxW * .6 / chipW; fs *= f; pad *= f; chipW = maxW * .6; }
+  let sfs = 44, subW = sub ? tw(T.font, sub) * sfs : 0; const avail = maxW - (lab ? chipW + gap : 0);
+  if (sub && subW > avail) { sfs *= avail / subW; subW = avail; }
+  const tot = chipW + (lab && sub ? gap : 0) + subW; let cx = align === 'right' ? x - tot : x;
+  const mid = y + hgt / 2;
+  if (lab) {
+    ctx.save(); shadow(env, ['rgba(0,0,0,.3)', 0, 4, 5]);
+    if (T.chipSkew) { ctx.translate(cx, mid); ctx.transform(1, 0, -.2, 1, 0, 0); ctx.translate(-cx, -mid); }
+    ctx.fillStyle = T.chip[0]; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(cx, y, chipW, hgt, T.chipR || 9); else ctx.rect(cx, y, chipW, hgt); ctx.fill();
+    shadow(env, null);
+    if (T.chipLine) { ctx.strokeStyle = T.chipLine; ctx.lineWidth = 2.5; ctx.stroke(); }
+    ctx.fillStyle = T.chip[1]; ctx.font = fontCss(T.font, fs); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(lab, cx + chipW / 2, mid + (M.a - M.d) / 2 * fs); ctx.restore();
+    cx += chipW + gap;
+  }
+  if (sub) paint(env, [{t: sub, x: cx, y: mid + (M.a - M.d) / 2 * sfs, size: sfs, ink: Object.assign({sh: ['rgba(0,0,0,.4)', 0, .04, .05]}, T.sub)}]);
+  return hgt;
+}
+function badge(env) { // YouTubeの再生時間の位置
+  const {ctx} = env, w = 122, h = 52, x = W - w - 22, y = H - h - 22;
+  ctx.save(); ctx.fillStyle = 'rgba(0,0,0,.8)'; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(x, y, w, h, 10); else ctx.rect(x, y, w, h); ctx.fill();
+  ctx.fillStyle = '#FFFFFF'; ctx.font = '700 32px Roboto, Arial, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('30:12', x + w / 2, y + h / 2 + 2); ctx.restore();
+}
+
+/* ================= 型（配置） ================= */
+const HEAD = 62, DIM = [0, .45, 1], hasHead = () => !!(S.label.trim() || S.sub.trim());
+const photo = () => S.person && !S.person.cutout;
+const LAYOUTS = {
+  right: { name: '人物右・文字左', note: 'いちばんよく見る形', draw(env) {
+    env.focus = [950, 330]; background(env);
+    if (S.bg) scrim(env, 0, 0, 800, 0, .7, 0);
+    person(env, {x: 590, y: 0, w: 690, h: H}, 'slantR');
+    const top = hasHead() ? 40 + HEAD + 22 : 50;
+    mainText(env, {x: MG, y: top, w: 624, h: H - 50 - top}, {style: 'stack', lines: 4, align: 'left'});
+    head(env, MG, 40, 600, 'left');
+  } },
+  left: { name: '人物左・文字右', note: '人物が右を向いているとき', draw(env) {
+    env.focus = [330, 330]; background(env);
+    if (S.bg) scrim(env, W, 0, 480, 0, .7, 0);
+    person(env, {x: 0, y: 0, w: 690, h: H}, 'slantL');
+    const top = hasHead() ? 40 + HEAD + 22 : 50;
+    mainText(env, {x: W - MG - 624, y: top, w: 624, h: H - 112 - top}, {style: 'stack', lines: 4, align: 'right'});
+    head(env, W - MG, 40, 600, 'right');
+  } },
+  bottom: { name: '下にテロップ', note: '画面をそのまま見せたいとき', draw(env) {
+    env.focus = [640, 300]; background(env);
+    if (photo() && !S.bg) person(env, null, 'full'); else person(env, {x: 290, y: 0, w: 700, h: H}, 'photo', {x: 230, y: 36, w: 820, h: 400});
+    scrim(env, 0, 290, 0, H, 0, env.img ? .9 : .62);
+    mainText(env, {x: MG, y: 404, w: 1052, h: 272}, {style: 'uniform', lines: 2, align: 'left', valign: 'bottom'});
+    head(env, MG, 40, 760, 'left');
+  } },
+  split: { name: '上と下にふりわけ', note: '前フリを上、オチを下に', draw(env) {
+    env.focus = [880, 320]; background(env);
+    if (S.bg) scrim(env, 0, 0, 760, 0, .6, 0);
+    if (photo() && !S.bg) person(env, null, 'full'); else person(env, {x: 520, y: 0, w: 720, h: H}, 'slantR');
+    scrim(env, 0, 400, 0, H, 0, env.img ? .85 : .55);
+    const hh = hasHead() ? HEAD : 0;
+    splitText(env, {x: MG, y: hh ? 40 + hh + 22 : 48, w: 590, h: 150}, {x: MG, y: 468, w: 1052, h: 208});
+    head(env, MG, 40, 590, 'left');
+  } },
+  panel: { name: '斜めパネル', note: '背景がごちゃつくとき', draw(env) {
+    const {ctx, T} = env; env.focus = [930, 330]; background(env);
+    if (photo()) person(env, {x: 560, y: 0, w: 720, h: H}, [[700, 0], [W, 0], [W, H], [566, H]]);
+    const pts = [[0, 0], [700, 0], [566, H], [0, H]];
+    ctx.save(); shadow(env, ['rgba(0,0,0,.45)', 26, 8, 0]); const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, T.panel[0]); g.addColorStop(1, T.panel[1]); ctx.fillStyle = g; poly(ctx, pts); ctx.fill(); ctx.restore();
+    ctx.save(); poly(ctx, pts); ctx.clip(); env.focus = [200, 360]; pattern(env, T.gen[2] === 'dusk' ? 'dusk' : 'stripes', T.panel[2], T.gen[2] === 'dusk' ? .3 : .07, 1); ctx.restore();
+    ctx.save(); ctx.strokeStyle = T.panel[2]; ctx.lineWidth = 12; ctx.beginPath(); ctx.moveTo(704, -20); ctx.lineTo(562, H + 20); ctx.stroke(); ctx.restore();
+    if (!photo()) person(env, {x: 560, y: 0, w: 720, h: H});
+    const top = hasHead() ? 40 + HEAD + 22 : 50;
+    mainText(env, {x: MG, y: top, w: 500, h: H - 50 - top}, {style: 'stack', lines: 4, align: 'left', ratio: 1.6});
+    head(env, MG, 40, 540, 'left');
+  } },
+  tate: { name: '縦書き', note: '短い決めゼリフ向き', draw(env) {
+    env.focus = [840, 330]; background(env);
+    if (S.bg) scrim(env, 0, 0, 600, 0, .72, 0);
+    person(env, {x: 440, y: 0, w: 780, h: H}, 'slantR');
+    const hd = hasHead();
+    verticalText(env, {x: 58, y: 48, w: 410, h: hd ? 536 : 624});
+    if (hd) head(env, MG, H - 42 - HEAD, 620, 'left');
+  } },
+  strips: { name: '横にならべる', note: 'コラボ・場面を2〜4枚', multi: true, draw(env) {
+    const list = imgs().slice(0, 4), n = list.length, sl = 64;
+    env.focus = [640, 320]; background(env);
+    const edge = i => i <= 0 ? -sl : i >= n ? W + sl : W * i / n;
+    list.forEach((P, i) => {
+      const x0 = edge(i), x1 = edge(i + 1), pts = [[x0 + sl / 2, 0], [x1 + sl / 2, 0], [x1 - sl / 2, H], [x0 - sl / 2, H]];
+      const vx = Math.max(0, x0 - sl / 2), wide = W / n * (n === 2 ? 1 : 1.5); // 切り抜きは、となりと少し重ねて大きく見せる
+      const fit = P.cutout ? {x: W * (i + .5) / n - wide / 2, y: 0, w: wide, h: H} : {x: vx, y: 0, w: Math.min(W, x1 + sl / 2) - vx, h: H};
+      cellImage(env, P, i, pts, fit, false);
+    });
+    for (let i = 1; i < n; i++) if (!list[i - 1].cutout || !list[i].cutout) { const X = y => W * i / n + sl / 2 - sl * y / H; seam(env, [X(-20), -20], [X(H + 20), H + 20]); }
+    scrim(env, 0, 300, 0, H, 0, env.img ? .9 : .62);
+    mainText(env, {x: MG, y: 404, w: 1052, h: 272}, {style: 'uniform', lines: 2, align: 'left', valign: 'bottom'});
+    head(env, MG, 40, 760, 'left');
+  } },
+  rows: { name: '上下にならべる', note: '総集編・まんなかに題', multi: true, draw(env) {
+    const {ctx, T} = env, list = imgs().slice(0, 4), n = list.length, top = n >= 3 ? 2 : 1, mid = H / 2, sl = 40, groups = parseMain().groups;
+    const two = groups.length >= 2 || [...S.main.replace(/\s/g, '')].length > 9, bh = two ? 256 : 208, vis = (H - bh) / 2 + 6; // 題が2行になるときは帯を太くする
+    env.focus = [640, 360]; background(env);
+    const row = (k, y0, y1, fy, first) => { // 帯に隠れない部分（高さ vis）に画像の中心が来るように入れる
+      for (let j = 0; j < k; j++) {
+        const x0 = j ? W * j / k : -sl, x1 = j < k - 1 ? W * (j + 1) / k : W + sl, vx = Math.max(0, x0);
+        const P = list[first + j], show = clamp(.95 * P.w / P.h, .28, .8); // 切り抜きは顔が帯に隠れない大きさに（全身の画像は上のほうを大きく）
+        cellImage(env, P, first + j, [[x0 + sl / 2, y0], [x1 + sl / 2, y0], [x1 - sl / 2, y1], [x0 - sl / 2, y1]], {x: vx, y: fy, w: Math.min(W, x1) - vx, h: vis}, true, show);
+      }
+      if (k === 2 && !(list[first].cutout && list[first + 1].cutout)) seam(env, [W / 2 + sl / 2 + 2, y0 - 10], [W / 2 - sl / 2 - 2, y1 + 10]); // 切り抜きどうしなら境目の線は引かない
+    };
+    row(top, 0, mid, 0, 0); row(n - top, mid, H, H - vis, top);
+    ctx.save(); ctx.translate(W / 2, mid); ctx.rotate((T.tilt || -2.5) * Math.PI / 180); ctx.translate(-W / 2, -mid);
+    ctx.save(); shadow(env, ['rgba(0,0,0,.5)', 26, 0, 6]); const g = ctx.createLinearGradient(0, mid - bh / 2, 0, mid + bh / 2); g.addColorStop(0, T.panel[0]); g.addColorStop(1, T.panel[1]); ctx.fillStyle = g; ctx.fillRect(-80, mid - bh / 2, W + 160, bh); ctx.restore();
+    ctx.fillStyle = T.panel[2]; ctx.fillRect(-80, mid - bh / 2, W + 160, 8); ctx.fillRect(-80, mid + bh / 2 - 8, W + 160, 8);
+    block(env, groups, {x: 76, y: mid - bh / 2 + 24, w: W - 152, h: bh - 48}, {style: 'uniform', lines: two ? 2 : 1, align: 'center', valign: 'center', max: 170, noTilt: true});
+    ctx.restore();
+    head(env, MG, 30, 620, 'left');
+  } },
+};
+const LAYOUT_ORDER = ['right', 'left', 'bottom', 'split', 'panel', 'tate', 'strips', 'rows'];
+/* 入れた画像が背景になっているか（「背景の暗さ」が効く場面） */
+const imgBacked = lay => !!S.bg || (photo() && (lay === 'bottom' || lay === 'split')) || (!!LAYOUTS[lay].multi && imgs().some(P => !P.cutout));
+const layoutNow = id => LAYOUTS[id].multi && !multi() ? 'right' : id; // 画像が1枚なら、ならべる型は使えない
+
+function draw(canvas, opt = {}) {
+  const ctx = canvas.getContext('2d'), k = canvas.width / W;
+  ctx.setTransform(k, 0, 0, k, 0, 0); ctx.clearRect(0, 0, W, H); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  const T = themeOf(opt.theme || S.theme);
+  const lay = layoutNow(opt.layout || S.layout), img = imgBacked(lay);
+  const env = {ctx, k, T, M: fm(T.font), perChar: !!(T.ls || T.jitter), info: {sizes: []}, focus: [W / 2, H / 2], f: img ? DIM[S.dim] : 1, bare: img && S.dim === 0, img, hits: []};
+  ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.clip();
+  LAYOUTS[lay].draw(env);
+  if (opt.badge) badge(env);
+  ctx.restore();
+  if (!env.hits.length && S.person) env.hits.push({i: 0, pts: [[0, 0], [W, 0], [W, H], [0, H]]}); // ドラッグで動かせる範囲
+  env.info.min = env.info.sizes.length ? Math.min(...env.info.sizes) : 0; env.info.T = T; env.info.hits = env.hits;
+  return env.info;
+}
+
+/* ================= 画面 ================= */
+const big = $('#big'), mini = $('#mini');
+const cand = {layout: new Map(), theme: new Map()};
+function buildCands() {
+  const lw = $('#layoutCands'), tw_ = $('#themeCands');
+  for (const id of LAYOUT_ORDER) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'cand'; b.setAttribute('role', 'radio'); b.dataset.id = id;
+    b.innerHTML = '<span class="cand-frame"><canvas width="512" height="288"></canvas></span><span><span class="cand-top"><span class="cand-name"></span><span class="flag" hidden>文字が最大</span></span><span class="cand-note"></span></span>';
+    b.querySelector('.cand-name').textContent = LAYOUTS[id].name; b.querySelector('.cand-note').textContent = LAYOUTS[id].note;
+    b.addEventListener('click', () => { S.layout = id; saveState(); syncSel(); syncMats(); refresh(); });
+    lw.appendChild(b); cand.layout.set(id, b);
+  }
+  for (const t of THEMES) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'cand'; b.setAttribute('role', 'radio'); b.dataset.id = t.id;
+    b.innerHTML = '<span class="cand-frame"><canvas width="512" height="288"></canvas></span><span><span class="cand-name"></span><span class="cand-note"></span><span class="cand-font"></span></span>';
+    b.querySelector('.cand-name').textContent = t.name; b.querySelector('.cand-note').textContent = t.use; b.querySelector('.cand-font').textContent = FONTS[t.font].label;
+    b.addEventListener('click', () => { S.theme = t.id; saveState(); syncSel(); syncEmphSwatches(); refresh(); });
+    tw_.appendChild(b); cand.theme.set(t.id, b);
+  }
+  arrowKeys(lw); arrowKeys(tw_);
+}
+function arrowKeys(group) { // 矢印キーで隣の選択肢へ
+  group.addEventListener('keydown', e => {
+    const dir = {ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1}[e.key]; if (!dir) return;
+    const list = [...group.querySelectorAll('button[role="radio"]')].filter(b => !b.hidden), i = list.indexOf(document.activeElement); if (i < 0) return;
+    e.preventDefault(); const n = list[(i + dir + list.length) % list.length]; n.focus(); n.click();
+  });
+}
+function syncSel() {
+  const many = multi(); $('#layoutCands').classList.toggle('four', many);
+  cand.layout.forEach((b, id) => { const on = id === S.layout; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; b.hidden = !!LAYOUTS[id].multi && !many; });
+  cand.theme.forEach((b, id) => { const on = id === S.theme; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
+}
+function buildChips() {
+  const box = $('#emphChips'), {keys} = parseMain();
+  for (const k of [...S.emph]) if (!keys.includes(k)) S.emph.delete(k);
+  box.textContent = '';
+  for (const k of keys) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.textContent = k; b.setAttribute('aria-pressed', S.emph.has(k));
+    b.addEventListener('click', () => { if (S.emph.has(k)) S.emph.delete(k); else S.emph.add(k); b.setAttribute('aria-pressed', S.emph.has(k)); saveState(); syncEmphSwatches(); refresh(); });
+    box.appendChild(b);
+  }
+  $('#emphField').hidden = !keys.length;
+}
+function buildSwatches() {
+  const box = $('#swatches'); box.textContent = '';
+  const add = (label, color, cls) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sw' + (cls ? ' ' + cls : ''); b.setAttribute('role', 'radio'); b.dataset.color = color || '';
+    if (color) { const i = document.createElement('i'); i.style.background = color; const c = document.createElement('code'); c.textContent = color; b.append(i, c); b.setAttribute('aria-label', label + ' ' + color); } else b.textContent = label;
+    b.addEventListener('click', () => { S.color = color || null; S.emphColor = null; saveState(); syncSwatches(); buildEmphSwatches(); refresh(); });
+    box.appendChild(b);
+  };
+  add('雰囲気におまかせ', null, 'plain');
+  const cols = (S.person && S.person.colors) || [];
+  cols.forEach(c => add('人物から拾った色', c));
+  const lab = document.createElement('label'); lab.className = 'sw';
+  const inp = document.createElement('input'); inp.type = 'color'; inp.id = 'customColor'; inp.value = '#8B5CF6'; inp.setAttribute('aria-label', '色を自分で選ぶ');
+  const sp = document.createElement('span'); sp.textContent = '自分で選ぶ';
+  inp.addEventListener('input', () => { S.color = inp.value.toUpperCase(); S.emphColor = null; saveState(); syncSwatches(); buildEmphSwatches(); refresh(); });
+  lab.append(inp, sp); box.appendChild(lab);
+  $('#colorsHint').textContent = cols.length ? '人物の画像から拾った色です。推しの色にすると統一感が出ます' : '推しの色にすると統一感が出ます';
+  syncSwatches();
+}
+function syncSwatches() {
+  const box = $('#swatches'); let hit = false;
+  box.querySelectorAll('button.sw').forEach(b => { const on = (S.color || '') === b.dataset.color; if (on) hit = true; b.setAttribute('aria-checked', on); });
+  const lab = box.querySelector('label.sw'), custom = !!S.color && !hit;
+  lab.dataset.on = custom; lab.querySelector('span').textContent = custom ? S.color : '自分で選ぶ';
+  if (custom && lab.querySelector('input').value.toUpperCase() !== S.color) lab.querySelector('input').value = S.color;
+}
+/* 目立たせる言葉の色: おまかせ（文字色になじむ色）のほか、文字色から出した候補を並べる */
+function buildEmphSwatches() {
+  const box = $('#emphSwatches'); box.textContent = '';
+  const add = (label, color) => {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sw'; b.setAttribute('role', 'radio'); b.dataset.color = color || '';
+    const i = document.createElement('i'); if (color) i.style.background = color; b.append(i, document.createTextNode(label));
+    b.addEventListener('click', () => { S.emphColor = color || null; saveState(); syncEmphSwatches(); refresh(); });
+    box.appendChild(b);
+  };
+  add('おまかせ', null);
+  for (const [label, c] of emphChoices()) add(label, c);
+  const lab = document.createElement('label'); lab.className = 'sw';
+  const inp = document.createElement('input'); inp.type = 'color'; inp.id = 'customEmph'; inp.value = '#FF70CB'; inp.setAttribute('aria-label', '目立たせる言葉の色を自分で選ぶ');
+  const sp = document.createElement('span'); sp.textContent = '自分で選ぶ';
+  inp.addEventListener('input', () => { S.emphColor = inp.value.toUpperCase(); saveState(); syncEmphSwatches(); refresh(); });
+  lab.append(inp, sp); box.appendChild(lab);
+  syncEmphSwatches();
+}
+function syncEmphSwatches() {
+  const box = $('#emphSwatches'); let hit = false;
+  box.querySelectorAll('button.sw').forEach(b => {
+    const on = (S.emphColor || '') === b.dataset.color; if (on) hit = true; b.setAttribute('aria-checked', on);
+    if (!b.dataset.color) b.querySelector('i').style.background = lastOf(baseTheme(S.theme).emph.fill); // おまかせで実際に使う色
+  });
+  const lab = box.querySelector('label.sw'), custom = !!S.emphColor && !hit;
+  lab.dataset.on = custom; lab.querySelector('span').textContent = custom ? S.emphColor : '自分で選ぶ';
+  if (custom && lab.querySelector('input').value.toUpperCase() !== S.emphColor) lab.querySelector('input').value = S.emphColor;
+  $('#emphHint').textContent = !S.emph.size ? '上の「目立たせる言葉」を押すと使われます' : S.emphColor ? '文字の色を変えると、おまかせに戻ります' : S.color ? '文字の色になじむ色を自動で選んでいます' : '雰囲気ごとに決まった色です';
+}
+function syncDim() {
+  const seg = $('#dimSeg'); seg.hidden = !imgBacked(layoutNow(S.layout));
+  seg.querySelectorAll('button').forEach(b => { const on = +b.dataset.dim === S.dim; b.setAttribute('aria-checked', on); b.tabIndex = on ? 0 : -1; });
+}
+function drawThumb(cv, img) {
+  const x = cv.getContext('2d'); x.clearRect(0, 0, cv.width, cv.height); if (!img) return;
+  const s = Math.min(cv.width / img.width, cv.height / img.height), w = img.width * s, h = img.height * s;
+  x.imageSmoothingQuality = 'high'; x.drawImage(img, (cv.width - w) / 2, (cv.height - h) / 2, w, h);
+}
+function syncMats() {
+  const P = S.person, n = imgs().length, many = LAYOUTS[S.layout].multi && n >= 2;
+  drawThumb($('#thumbPerson'), P && P.base); drawThumb($('#thumbBg'), S.bg && S.bg.src);
+  $('#tagPerson').textContent = !P ? '人物なし' : S.sample ? '見本を表示中' : P.cutout ? '切り抜き画像' : '四角い画像';
+  $('#hintPerson').textContent = !P ? '人物を入れずに、背景と文字だけで作ります。' : (S.sample || P.cutout) ? '背景が透明なPNGなら、白フチ付きの切り抜きで入ります。' : '背景が透けていないので、枠付きで入れました。切り抜き済みのPNGだと人物だけが入ります。';
+  $('#resetPerson').hidden = S.sample; $('#nonePerson').hidden = !P;
+  $('#tagBg').textContent = S.bg ? '画像を使用中' : '自動の背景';
+  $('#hintBg').textContent = S.bg ? '入れた画像をそのまま使います。文字が読みにくいときは「背景の暗さ」で調整できます。' : '入れなければ、雰囲気に合う背景を自動で作ります。';
+  $('#clearBg').hidden = !S.bg; $('#tBlur').hidden = !S.bg; $('#tDeco').hidden = !S.bg; $('#tFlip').hidden = !(many || P);
+  // 追加の画像
+  const list = $('#extraList'); list.textContent = '';
+  S.extra.forEach((X, i) => {
+    const w = document.createElement('span'); w.className = 'ex'; const c = document.createElement('canvas'); c.width = 128; c.height = 128; drawThumb(c, X.base);
+    const d = document.createElement('button'); d.type = 'button'; d.className = 'x-del'; d.textContent = '×'; d.setAttribute('aria-label', `追加の画像${i + 1}を外す`);
+    d.addEventListener('click', () => { const was = multi(); S.extra.splice(i, 1); imgsChanged(was); });
+    w.append(c, d); list.appendChild(w);
+  });
+  $('#pickExtra').hidden = S.extra.length >= 3;
+  $('#hintExtra').textContent = !S.extra.length ? '2枚目からの画像を入れると、画像をならべる型が選べます。' : S.extra.length >= 3 ? '追加は3枚までです。' : `あと${3 - S.extra.length}枚入れられます。「横にならべる」「上下にならべる」の型で使われます。`;
+  // どの画像を動かすか
+  const seg = $('#selSeg'), box = $('#selBtns'); seg.hidden = !many;
+  if (box.children.length !== n) { box.textContent = ''; for (let i = 0; i < n; i++) { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.setAttribute('role', 'radio'); b.textContent = i + 1 + '枚目'; b.addEventListener('click', () => { S.sel = i; syncTune(); syncMats(); }); box.appendChild(b); } }
+  [...box.children].forEach((b, i) => { b.setAttribute('aria-checked', i === S.sel); b.tabIndex = i === S.sel ? 0 : -1; });
+  const who = many ? `${S.sel + 1}枚目` : '人物';
+  $('#labZoom').textContent = who + 'の大きさ'; $('#labX').textContent = who + 'の左右'; $('#labY').textContent = who + 'の上下';
+  $('#tFlip').textContent = many ? `${S.sel + 1}枚目を左右反転` : '人物を左右反転';
+  $('#dragNote').textContent = many ? '画像はそれぞれドラッグして動かせます。' : '人物はマウスでドラッグして動かせます。';
+  syncDim();
+}
+/* 画像が増減したあとの後始末 */
+function imgsChanged(wasMulti) {
+  S.sel = clamp(S.sel, 0, Math.max(0, imgs().length - 1));
+  if (LAYOUTS[S.layout].multi && !multi()) S.layout = 'right';
+  else if (multi() && !wasMulti && !LAYOUTS[S.layout].multi) S.layout = 'strips'; // 2枚目が入ったら、ならべる型に切り替える
+  syncSel(); syncTune(); buildSwatches(); syncMats(); saveState(); refresh();
+}
+
+/* ================= まとめて決める（おまかせ3案・お気に入り） ================= */
+const STYLE = ['color', 'emphColor', 'dim', 'blur', 'deco', 'smallP', 'textScale'];
+/* いまの素材のまま、別の組み合わせで描く */
+function drawWith(canvas, st, opt) {
+  const keep = {}; for (const k of STYLE) { keep[k] = S[k]; if (k in st) S[k] = st[k]; }
+  try { return draw(canvas, Object.assign({layout: st.layout, theme: st.theme}, opt)); } finally { Object.assign(S, keep); }
+}
+const sameStyle = st => S.layout === layoutNow(st.layout) && S.theme === st.theme && (S.color || null) === (st.color || null) && (S.emphColor || null) === (st.emphColor || null) && STYLE.slice(2).every(k => !(k in st) || S[k] === st[k]);
+function applyStyle(st) {
+  S.layout = layoutNow(st.layout); S.theme = st.theme; S.color = st.color || null; S.emphColor = st.emphColor || null;
+  for (const k of STYLE.slice(2)) if (k in st) S[k] = st[k];
+  syncSel(); syncSwatches(); buildEmphSwatches(); syncTune(); syncMats(); saveState(); refresh();
+}
+function quickCard(group, label) {
+  const b = document.createElement('button'); b.type = 'button'; b.className = 'cand'; b.setAttribute('role', 'radio'); b.setAttribute('aria-checked', 'false');
+  b.innerHTML = '<span class="cand-frame"><canvas width="512" height="288"></canvas></span><span><span class="cand-name"></span><span class="cand-note"></span></span>';
+  b.querySelector('.cand-name').textContent = label; group.appendChild(b); return b;
+}
+/* 文字に入っている言葉から、合いそうな雰囲気を先に出す */
+const MOODS = [
+  ['zekkyo', /絶叫|叫|悲鳴|ホラー|怖|こわ|恐怖|びび|ビビ|ドッキリ|ぎゃ|ギャ|事故|発狂/],
+  ['bakusho', /爆笑|笑|草|ｗ|ww|ツッコミ|おもしろ|面白|ネタ|迷言|珍/],
+  ['kawaii', /かわい|可愛|癒|ほのぼの|あくび|寝|ねむ|眠|赤ちゃん|デレ|照れ|甘え|くしゃみ/],
+  ['emo', /てぇてぇ|尊|感動|泣|涙|エモ|名言|卒業|ありがとう|思い出/],
+  ['cool', /神|最強|かっこ|イケ|クラッチ|優勝|勝利|無双|天才|スーパープレイ/],
+  ['soushu', /まとめ|総集編|選|連発|集|年間|ベスト|ランキング|名場面/],
+  ['obi', /速報|悲報|朗報|お知らせ|告知|発表|解説|検証|【/],
+];
+let propSeed = 0, props = [], propKey = '';
+const propBtns = [], rankCv = mk(64, 36);
+function buildProps() {
+  const text = S.main + ' ' + S.sub + ' ' + S.label, cols = ((S.person && S.person.colors) || []).filter(c => rgb2hsl(hex2rgb(c))[1] >= .12);
+  const key = [text, imgs().map(P => P.cutout ? 'c' : 'r').join(''), cols.join(), propSeed, !!S.bg].join('|');
+  if (key === propKey) return; propKey = key;
+  // 型: 文字が大きく入る順。画像が2枚以上あれば、ならべる型を先にする
+  const chars = [...S.main.replace(/\s/g, '')].length, sz = {};
+  let L = LAYOUT_ORDER.filter(id => !LAYOUTS[id].multi && !(id === 'tate' && chars > 10));
+  for (const id of L) sz[id] = drawWith(rankCv, {layout: id, theme: 'teiban', color: null, emphColor: null, textScale: 1}).min;
+  L.sort((a, b) => sz[b] - sz[a]); if (multi()) L = ['strips', 'rows'].concat(L);
+  const hit = MOODS.map(([id, re]) => [id, text.search(re)]).filter(x => x[1] >= 0).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+  const TH = hit.concat(['teiban', 'soushu', 'bakusho', 'kawaii', 'cool', 'zekkyo', 'emo', 'obi'].filter(id => !hit.includes(id))), k = propSeed;
+  props = [0, 1, 2].map(i => ({layout: L[(i + k) % L.length], theme: TH[(i + 3 * k) % TH.length], emphColor: null,
+    color: cols.length && (i === 1 || (i === 2 && k % 2 === 1)) ? cols[(k + i - 1) % cols.length] : null})); // 3案のうち1つは、人物から拾った色で
+  props.forEach((p, i) => { const b = propBtns[i], th = THEMES.find(t => t.id === p.theme);
+    b.querySelector('.cand-name').textContent = th.name + (p.color ? '（人物の色）' : ''); b.querySelector('.cand-note').textContent = LAYOUTS[p.layout].name; });
+}
+/* お気に入り: 型・雰囲気・色などの組み合わせに名前を付けて残す */
+const FAVS = 'samune-katagami-favs-v1', FAV_MAX = 12;
+let favs = [], favUndo = null;
+function cleanFav(x) { // 保存してあったものは、形を確かめてから使う
+  if (!x || typeof x !== 'object') return null; const st = x.st && typeof x.st === 'object' ? x.st : {}, name = String(x.name == null ? '' : x.name).trim().slice(0, 24); if (!name) return null;
+  const hex = v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toUpperCase() : null;
+  return {name, t: +x.t || 0, st: {layout: LAYOUTS[st.layout] ? st.layout : 'right', theme: THEMES.some(t => t.id === st.theme) ? st.theme : 'teiban', color: hex(st.color), emphColor: hex(st.emphColor),
+    dim: [0, 1, 2].includes(st.dim) ? st.dim : 0, blur: !!st.blur, deco: !!st.deco, smallP: st.smallP !== false, textScale: clamp(+st.textScale || 1, .6, 1)}};
+}
+const cleanFavs = list => (Array.isArray(list) ? list : []).map(cleanFav).filter(Boolean).slice(0, FAV_MAX);
+function renderFavs() {
+  const box = $('#favCands'); box.textContent = '';
+  favs.forEach((f, i) => {
+    const w = document.createElement('div'); w.className = 'fav'; const b = quickCard(w, f.name); b.dataset.i = i;
+    b.addEventListener('click', () => applyStyle(f.st));
+    const d = document.createElement('button'); d.type = 'button'; d.className = 'x-del'; d.textContent = '×'; d.setAttribute('aria-label', `お気に入り「${f.name}」を消す`);
+    d.addEventListener('click', () => { favUndo = {f, i}; favs.splice(i, 1); storeFavs(); renderFavs(); refresh(); });
+    w.appendChild(d); box.appendChild(w);
+  });
+  $('#favEmpty').hidden = favs.length > 0; box.hidden = !favs.length;
+  $('#favUndo').hidden = !favUndo; if (favUndo) $('#favUndoText').textContent = `「${favUndo.f.name}」を消しました。`;
+  syncQuick();
+}
+function syncQuick() { // いまの設定と同じ組み合わせに印を付ける
+  propBtns.forEach((b, i) => b.setAttribute('aria-checked', !!props[i] && sameStyle(props[i])));
+  $('#favCands').querySelectorAll('.cand').forEach(b => { const st = favs[+b.dataset.i].st, wait = LAYOUTS[st.layout].multi && !multi();
+    b.setAttribute('aria-checked', !wait && sameStyle(st));
+    b.querySelector('.cand-note').textContent = THEMES.find(t => t.id === st.theme).name + '・' + LAYOUTS[st.layout].name + (wait ? '（画像が2枚以上のとき）' : ''); });
+}
+
+/* 描き直しの段取り: 大きいプレビューを先に、候補はあとから順番に */
+let raf = 0, needMain = false, needCands = false, queue = [], minSizes = {};
+function refresh(scope) { needMain = true; if (scope !== 'main') needCands = true; if (!raf) raf = requestAnimationFrame(tick); }
+function tick() {
+  raf = 0;
+  if (needMain) { needMain = false; drawMain(); }
+  if (needCands) {
+    needCands = false; minSizes = {};
+    queue = LAYOUT_ORDER.filter(id => !LAYOUTS[id].multi || multi()).map(id => () => { minSizes[id] = draw(cand.layout.get(id).querySelector('canvas'), {layout: id}).min; })
+      .concat(THEMES.map(t => () => { draw(cand.theme.get(t.id).querySelector('canvas'), {theme: t.id}); }));
+    buildProps(); syncQuick();
+    queue = props.map((p, i) => () => { drawWith(propBtns[i].querySelector('canvas'), p); }).concat(queue,
+      [...$('#favCands').querySelectorAll('.cand')].map(b => () => { const f = favs[+b.dataset.i]; if (f) drawWith(b.querySelector('canvas'), f.st); }));
+  }
+  if (queue.length) {
+    const t0 = performance.now();
+    while (queue.length && performance.now() - t0 < 12) queue.shift()();
+    if (queue.length) raf = requestAnimationFrame(tick); else flagBiggest();
+  }
+}
+function flagBiggest() {
+  const ids = LAYOUT_ORDER.filter(id => id !== 'tate' && minSizes[id] > 0); let top = null;
+  ids.forEach(id => { if (!top || minSizes[id] > minSizes[top] * 1.02) top = id; });
+  cand.layout.forEach((b, id) => { b.querySelector('.flag').hidden = id !== top; });
+}
+let lastInfo = null, lastHits = [];
+function drawMain() {
+  const info = draw(big, {badge: S.badge}); draw(mini, {badge: true}); lastInfo = info; lastHits = info.hits;
+  const pill = $('#legPill'), txt = $('#legText'), px = info.min * 168 / W;
+  if (!info.sizes.length) { pill.hidden = true; txt.textContent = 'メインの文字を入れると、ここで読みやすさを確かめられます。'; }
+  else {
+    pill.hidden = false; const ok = info.min >= 84, mid = info.min >= 62;
+    pill.className = 'pill ' + (ok ? 'good' : 'warn'); pill.textContent = ok ? '小さくても読める' : mid ? 'やや小さい' : '文字が小さい';
+    txt.textContent = ok ? 'スマホの一覧では、このくらいの大きさで表示されます。右下は再生時間で隠れるので、文字を置いていません。' : `一覧では文字が約${Math.max(1, Math.round(px))}pxになります。文字を減らすか、「文字が最大」の型を選ぶと読みやすくなります。`;
+  }
+  buildRecipe(info);
+}
+const fillText = f => Array.isArray(f) ? f.join(' → ') : f;
+function recipeRows(info) {
+  const T = info.T, rows = [];
+  rows.push(['型', LAYOUTS[S.layout].name]); rows.push(['雰囲気', T.name + (S.color ? '（色を変更）' : '')]); rows.push(['フォント', FONTS[T.font].label]);
+  rows.push(['文字色', fillText(T.main.fill), T.main.fill]); rows.push(['目立たせる色', fillText(T.emph.fill), T.emph.fill]);
+  if (T.band) rows.push(['帯の色', T.bandBg, T.bandBg]);
+  T.main.st.forEach((s, i) => rows.push([T.main.st.length > 1 ? (i ? 'フチ（外）' : 'フチ（内）') : 'フチ', s[0], s[0]]));
+  if (info.sizes.length) rows.push(['文字サイズ', info.sizes.map(s => Math.round(s) + 'px').join(' / ')]);
+  return rows;
+}
+function buildRecipe(info) {
+  const dl = $('#recipe'); dl.textContent = '';
+  for (const [k, v, col] of recipeRows(info)) {
+    const dt = document.createElement('dt'); dt.textContent = k; const dd = document.createElement('dd');
+    if (col) (Array.isArray(col) ? col : [col]).forEach(c => { const d = document.createElement('span'); d.className = 'dot'; d.style.background = c; dd.appendChild(d); });
+    dd.appendChild(document.createTextNode(v)); dl.append(dt, dd);
+  }
+}
+
+/* フォントは使う文字の分だけ読み込まれるので、文字が変わるたびに読み込みを頼む */
+let fontKey = '';
+function ensureFonts() {
+  if (!document.fonts || !document.fonts.load) return;
+  const text = S.main + S.sub + S.label + '国永あア0123456789:';
+  if (text === fontKey) return; fontKey = text;
+  Promise.all(Object.keys(FONTS).map(fk => document.fonts.load(fontCss(fk, 40), text).catch(() => null))).then(() => { resetMetrics(); refresh(); });
+}
+
+/* ================= 操作 ================= */
+function setErr(msg, info) { const n = $('#matNote'); if (msg) { n.textContent = msg; n.classList.toggle('err', !info); } else { n.textContent = '画像は枠にドラッグしても、コピーして貼り付け（Ctrl+V）しても入ります。画像はこのページの外へ送られません。'; n.classList.remove('err'); } }
+async function takeFile(file, slot) {
+  if (!file || !/^image\//.test(file.type)) { setErr('画像ファイル（PNG・JPG・WebP）を入れてください。'); return; }
+  if (slot === 'extra' && S.extra.length >= 3) { setErr('追加の画像は3枚までです。入れ替えるときは、×で外してから追加してください。'); return; }
+  let c; try { c = await fileToCanvas(file); } catch (e) { setErr('この画像は読み込めませんでした。PNG・JPG・WebPで試してください。'); return; }
+  setErr('');
+  if (slot === 'auto') slot = analyze(c).cutout ? 'person' : 'bg';
+  if (slot === 'extra' && S.sample && S.person) { slot = 'person'; setErr('見本の代わりに、1枚目として「人物」に入れました。続けて追加すると2枚目になります。', true); }
+  const was = multi();
+  if (slot === 'person') { S.person = prepPerson(c); S.sample = false; S.sel = 0; imgsChanged(was); }
+  else if (slot === 'extra') { if (S.extra.length >= 3) return; S.extra.push(prepPerson(c)); S.sel = imgs().length - 1; imgsChanged(was); }
+  else { S.bg = prepBg(c); syncMats(); refresh(); }
+}
+function useSample() { const was = multi(); S.person = prepPerson(makeSample()); S.sample = true; S.sel = 0; imgsChanged(was); }
+function syncTune() {
+  $('#pZoom').value = Math.round(S.adj.zoom * 100); $('#pX').value = Math.round(S.adj.dx * 100); $('#pY').value = Math.round(S.adj.dy * 100); $('#tScale').value = Math.round(S.textScale * 100);
+  $('#tFlip').setAttribute('aria-pressed', S.adj.flip); $('#tBlur').setAttribute('aria-pressed', S.blur); $('#tDeco').setAttribute('aria-pressed', S.deco); $('#tBadge').setAttribute('aria-pressed', S.badge); $('#tSmallP').setAttribute('aria-pressed', S.smallP);
+}
+function wire() {
+  for (const [slot, drop, pick, file] of [['person', '#dropPerson', '#pickPerson', '#filePerson'], ['bg', '#dropBg', '#pickBg', '#fileBg'], ['extra', '#dropExtra', '#pickExtra', '#fileExtra']]) {
+    const d = $(drop), f = $(file);
+    const take = async list => { for (const fl of slot === 'extra' ? [...list] : [...list].slice(0, 1)) await takeFile(fl, slot); }; // 追加の画像は何枚かまとめて入れられる
+    $(pick).addEventListener('click', () => f.click());
+    f.addEventListener('change', () => { take(f.files).then(() => { f.value = ''; }); });
+    d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('over'); });
+    d.addEventListener('dragleave', () => d.classList.remove('over'));
+    d.addEventListener('drop', e => { e.preventDefault(); d.classList.remove('over'); const fl = e.dataTransfer && e.dataTransfer.files; if (fl && fl.length) take(fl); else setErr('ほかのページの画像はそのまま入れられません。いったん保存してから、ファイルを入れてください。'); });
+  }
+  arrowKeys($('#selSeg'));
+  window.addEventListener('dragover', e => e.preventDefault()); window.addEventListener('drop', e => e.preventDefault());
+  document.addEventListener('paste', e => {
+    const it = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.kind === 'file' && /^image\//.test(i.type)); if (!it) return;
+    e.preventDefault(); const ae = document.activeElement;
+    takeFile(it.getAsFile(), ae && ae.closest && ae.closest('#dropBg') ? 'bg' : ae && ae.closest && ae.closest('#dropExtra') ? 'extra' : ae && ae.closest && ae.closest('#dropPerson') ? 'person' : 'auto');
+  });
+  $('#resetPerson').addEventListener('click', useSample);
+  $('#nonePerson').addEventListener('click', () => { const was = multi(); S.person = null; S.sample = false; imgsChanged(was); });
+  $('#clearBg').addEventListener('click', () => { S.bg = null; syncMats(); refresh(); });
+
+  const mainEl = $('#mainText'), subEl = $('#subText'), labEl = $('#labelText');
+  mainEl.value = S.main; subEl.value = S.sub; labEl.value = S.label;
+  mainEl.addEventListener('input', () => { S.main = mainEl.value; buildChips(); saveState(); ensureFonts(); refresh(); });
+  subEl.addEventListener('input', () => { S.sub = subEl.value; saveState(); ensureFonts(); refresh(); });
+  labEl.addEventListener('input', () => { S.label = labEl.value; saveState(); ensureFonts(); refresh(); });
+
+  const tog = (id, get, set) => $(id).addEventListener('click', () => { set(!get()); syncTune(); refresh(); });
+  tog('#tFlip', () => S.adj.flip, v => { S.adj.flip = v; }); tog('#tBlur', () => S.blur, v => S.blur = v); tog('#tDeco', () => S.deco, v => S.deco = v); tog('#tSmallP', () => S.smallP, v => S.smallP = v);
+  $('#tBadge').addEventListener('click', () => { S.badge = !S.badge; syncTune(); refresh('main'); });
+  $('#dimSeg').querySelectorAll('button').forEach(b => b.addEventListener('click', () => { S.dim = +b.dataset.dim; saveState(); syncDim(); refresh(); })); arrowKeys($('#dimSeg'));
+  const rng = (id, fn) => { const el = $(id); el.addEventListener('input', () => { fn(+el.value / 100); refresh('main'); }); el.addEventListener('change', () => refresh()); };
+  rng('#pZoom', v => S.adj.zoom = v); rng('#pX', v => S.adj.dx = v); rng('#pY', v => S.adj.dy = v); rng('#tScale', v => S.textScale = v);
+  $('#tReset').addEventListener('click', () => { S.adj = Object.assign(newAdj(), {flip: S.adj.flip}); S.textScale = 1; syncTune(); refresh(); });
+
+  // 人物をドラッグで動かす（タッチは縦スクロールを優先するので、スライダーを使う）
+  let drag = null;
+  const inPoly = (pts, x, y) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
+  big.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch' || !lastHits.length) return;
+    const r = big.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W, y = (e.clientY - r.top) / r.height * H;
+    const hit = [...lastHits].reverse().find(h => inPoly(h.pts, x, y)) || lastHits[0]; // つかんだ場所の画像を動かす
+    if (hit.i !== S.sel) { S.sel = hit.i; syncTune(); syncMats(); }
+    drag = {x: e.clientX, y: e.clientY, dx: S.adj.dx, dy: S.adj.dy}; big.setPointerCapture(e.pointerId); big.classList.add('dragging');
+  });
+  big.addEventListener('pointermove', e => { if (!drag) return; const r = big.getBoundingClientRect(); S.adj.dx = clamp(drag.dx + (e.clientX - drag.x) / r.width, -.5, .5); S.adj.dy = clamp(drag.dy + (e.clientY - drag.y) / r.height, -.5, .5); syncTune(); refresh('main'); });
+  const end = () => { if (!drag) return; drag = null; big.classList.remove('dragging'); refresh(); };
+  big.addEventListener('pointerup', end); big.addEventListener('pointercancel', end);
+
+  // おまかせ3案
+  const pg = $('#propCands');
+  for (let i = 0; i < 3; i++) { const b = quickCard(pg, ''); propBtns.push(b); b.addEventListener('click', () => { if (props[i]) applyStyle(props[i]); }); }
+  arrowKeys(pg); arrowKeys($('#favCands'));
+  $('#moreProps').addEventListener('click', () => { propSeed++; refresh(); });
+  // お気に入り
+  const form = $('#favForm'), nameEl = $('#favName'), fmsg = $('#favMsg');
+  const say = t => { fmsg.textContent = t; fmsg.hidden = !t; };
+  $('#favOpen').addEventListener('click', () => { form.hidden = false; $('#favOpen').hidden = true; say(''); nameEl.value = S.main.replace(/\s+/g, '').slice(0, 24) || THEMES.find(t => t.id === S.theme).name; nameEl.focus(); nameEl.select(); });
+  $('#favCancel').addEventListener('click', () => { form.hidden = true; $('#favOpen').hidden = false; say(''); $('#favOpen').focus(); });
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = nameEl.value.trim().slice(0, 24); if (!name) { say('名前を入れてください。'); nameEl.focus(); return; }
+    const at = favs.findIndex(f => f.name === name);
+    if (at < 0 && favs.length >= FAV_MAX) { say(`お気に入りは${FAV_MAX}個までです。使わないものを×で消してから保存してください。`); return; }
+    const item = cleanFav({name, t: Date.now(), st: {layout: S.layout, theme: S.theme, color: S.color, emphColor: S.emphColor, dim: S.dim, blur: S.blur, deco: S.deco, smallP: S.smallP, textScale: S.textScale}});
+    if (at >= 0) favs.splice(at, 1); favs.unshift(item); favUndo = null;
+    storeFavs(); renderFavs(); refresh(); form.hidden = true; $('#favOpen').hidden = false;
+    say(at >= 0 ? `「${name}」を上書きしました。` : `「${name}」を保存しました。次からは「まとめて決める」のお気に入りに並びます。`);
+  });
+  $('#favUndoBtn').addEventListener('click', () => { if (!favUndo) return; favs.splice(Math.min(favUndo.i, favs.length), 0, favUndo.f); favUndo = null; storeFavs(); renderFavs(); refresh(); });
+  $('#saveBtn').addEventListener('click', save);
+  $('#copyRecipe').addEventListener('click', async () => {
+    const text = recipeRows(lastInfo).map(r => r[0] + '：' + r[1]).join('\n'), msg = $('#copyMsg');
+    try { await navigator.clipboard.writeText(text); msg.textContent = 'コピーしました'; }
+    catch (e) { const r = document.createRange(); r.selectNodeContents($('#recipe')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); msg.textContent = '選択しました。Ctrl+Cでコピーできます'; }
+  });
+}
+
+/* ================= お気に入りの保存先 =================
+   まずこのブラウザに保存し、使えるときはページ側の本人専用の保存場所（db の data/users/<本人>/）にも置く。
+   そちらにあれば、ほかの端末で開いても同じお気に入りが出る */
+let cloud, cloudOk = false, writing = Promise.resolve(); // cloud: undefined=まだ確かめていない / null=使えない / それ以外=保存先
+const dirty = v => { try { if (v === undefined) return localStorage.getItem(FAVS + ':dirty') === '1'; localStorage.setItem(FAVS + ':dirty', v ? '1' : '0'); } catch (e) {} return false; };
+const keepLocal = () => { try { localStorage.setItem(FAVS, JSON.stringify(favs)); } catch (e) {} };
+function showWhere() { $('#favWhere').textContent = !favs.length ? '' : cloudOk ? 'このページに保存（ほかの端末でも使えます）' : 'このブラウザに保存'; }
+async function cloudDoc(ask) {
+  if (cloud !== undefined) return cloud;
+  try {
+    const C = window.claude; if (!C || typeof C.use !== 'function') return (cloud = null);
+    if (!ask) { // 開いただけで許可の確認が出ないように、確認が要るときは最初の保存まで待つ
+      const perm = await C.use('permissions'), st = perm ? await perm.state('db') : 'granted';
+      if (st === 'prompt') return undefined; if (st !== 'granted') return (cloud = null);
+    }
+    const [db, user] = await Promise.all([C.use('db'), C.use('user')]); if (!db || !user) return (cloud = null);
+    const uid = await user.id(); if (!uid) return (cloud = null);
+    return (cloud = db.doc('data/users/' + uid + '/favorites'));
+  } catch (e) { return (cloud = null); }
+}
+/* 保存先の中身を読んで手元に合わせる。こちらだけで変えた分があるときは、名前ごとに新しいほうを残す。戻り値: 保存先を書き直す必要があるか */
+let pulled = false;
+async function mergeDown(ref) {
+  const snap = await ref.get(), remote = snap.exists ? cleanFavs((snap.data() || {}).items) : [];
+  let next = remote;
+  if (dirty() || !snap.exists) { const m = new Map(); for (const f of remote.concat(favs)) { const o = m.get(f.name); if (!o || f.t > o.t) m.set(f.name, f); } next = [...m.values()].sort((a, b) => b.t - a.t).slice(0, FAV_MAX); }
+  pulled = true; cloudOk = true;
+  if (JSON.stringify(next) !== JSON.stringify(favs)) { favs = next; keepLocal(); renderFavs(); refresh(); }
+  return JSON.stringify(next) !== JSON.stringify(remote);
+}
+const writeUp = ref => ref.set({items: favs.map(f => ({name: f.name, t: f.t, st: f.st})), t: Date.now()});
+function sync(ask, changed) { // 同じ場所への読み書きは1つずつ順番に
+  writing = writing.then(async () => {
+    const ref = await cloudDoc(ask); if (!ref) { cloudOk = false; if (changed) dirty(true); showWhere(); return; }
+    try {
+      if (changed) dirty(true);
+      const need = pulled ? changed : await mergeDown(ref); // はじめて触るときは、先に保存先の中身と合わせる
+      if (need || changed) await writeUp(ref);
+      cloudOk = true; dirty(false);
+    } catch (e) {
+      let ok = false;
+      if (e && e.code === 'unavailable') { await new Promise(r => setTimeout(r, 500 + Math.random() * 900)); try { if (!pulled) await mergeDown(ref); await writeUp(ref); ok = true; dirty(false); } catch (e2) {} }
+      else cloud = null; // 書けない立場・容量いっぱい など: このブラウザだけに保存する
+      cloudOk = ok;
+    }
+    showWhere();
+  });
+}
+function storeFavs() { keepLocal(); showWhere(); sync(true, true); }
+
+/* ================= 保存 ================= */
+const dlReady = (window.claude && typeof window.claude.use === 'function') ? Promise.resolve(window.claude.use('downloads')).catch(() => null) : Promise.resolve(null);
+const toBlob = (c, type, q) => new Promise(r => c.toBlob(r, type, q)), LIMIT = 2e6;
+let fbUrl = null;
+async function save() {
+  const btn = $('#saveBtn'), msg = $('#saveMsg'); btn.disabled = true; msg.textContent = '画像を作っています…';
+  try {
+    const c = mk(W, H); draw(c, {badge: false});
+    let blob = await toBlob(c, 'image/png'), ext = 'png', jpg = false;
+    if (blob && blob.size > LIMIT) for (const q of [.92, .85, .75]) { const j = await toBlob(c, 'image/jpeg', q); if (j) { blob = j; ext = 'jpg'; jpg = true; if (j.size <= LIMIT) break; } } // YouTubeのサムネは2MBまで
+    if (!blob) throw new Error('blob');
+    const d = new Date(), p = n => String(n).padStart(2, '0');
+    const name = `thumbnail-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.${ext}`;
+    const kb = Math.round(blob.size / 1024), tail = `（${name}、${kb}KB${jpg ? '。PNGだと2MBを超えるのでJPGにしました' : ''}）`;
+    const dl = await dlReady; let done = false;
+    if (dl) {
+      try { await dl.save({filename: name, data: blob}); done = true; msg.textContent = '保存しました' + tail; $('#fallback').hidden = true; }
+      catch (e) { if (e && e.code === 'declined') { done = true; msg.textContent = '保存をやめました。'; } }
+    }
+    if (!done) {
+      if (fbUrl) URL.revokeObjectURL(fbUrl); fbUrl = URL.createObjectURL(blob);
+      $('#fallbackImg').src = fbUrl; $('#fallback').hidden = false;
+      const a = document.createElement('a'); a.href = fbUrl; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+      msg.textContent = '画像を用意しました' + tail;
+    }
+  } catch (e) { msg.textContent = '画像を作れませんでした。もう一度押してください。'; }
+  btn.disabled = false;
+}
+
+/* ================= 起動 ================= */
+loadState();
+buildCands(); syncSel(); wire(); buildChips();
+S.person = prepPerson(makeSample()); S.layout = layoutNow(S.layout); syncSel(); syncTune(); buildSwatches(); buildEmphSwatches(); syncMats();
+try { favs = cleanFavs(JSON.parse(localStorage.getItem(FAVS) || '[]')); } catch (e) {}
+renderFavs(); showWhere(); sync(false, false);
+refresh(); ensureFonts();
+if (document.fonts) { document.fonts.ready.then(() => { resetMetrics(); refresh(); }); }
+if (location.hostname === 'localhost') window.__sk = {S, draw, THEMES, LAYOUTS, LAYOUT_ORDER, prepPerson, prepBg, refresh, parseMain, syncMats, buildSwatches, buildChips, imgs, imgsChanged, drawWith, get props() { return props; }, get favs() { return favs; }};
+})();
+</script>
+</body>
+</html>

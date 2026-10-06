@@ -1,0 +1,9 @@
+{
+  // Cloudflare Workers の設定です。public フォルダの中身だけが公開されます。
+  // name は Cloudflare 側のプロジェクト名と同じにします（公開URLの先頭にもなります）。
+  "name": "samune-katagami",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public"
+  }
+}

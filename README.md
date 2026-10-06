@@ -1,0 +1,31 @@
+# サムネ型紙
+
+人物・背景の画像と文字を入れると、配置の型と雰囲気（フォント＋配色）の候補が並び、選ぶだけで 1280×720 のサムネイルを作れるツールです。
+入れた画像はブラウザの中だけで処理し、外部には送信しません。
+
+## 中身
+
+| ファイル | 役割 |
+| --- | --- |
+| `public/index.html` | 公開されるページ。このファイル1つで動きます |
+| `wrangler.jsonc` | Cloudflare Workers の設定。`public` フォルダの中身を公開します |
+| `src/samune-katagami.html` | ページの本体。直すときはこのファイルを編集します |
+| `tools/make-web.js` | 本体から `public/index.html` を作り直すスクリプト |
+
+## 公開のしくみ
+
+Cloudflare の Workers & Pages にこのリポジトリをつなぐと、`main` ブランチが更新されるたびに自動で公開されます。
+
+- プロジェクト名：`samune-katagami`（`wrangler.jsonc` の `name` と同じにします）
+- ビルドコマンド：なし
+- デプロイコマンド：`npx wrangler deploy`
+
+## 更新のしかた
+
+1. `src/samune-katagami.html` を直す
+2. `node tools/make-web.js` を実行して、`public/index.html` を作り直す
+3. 変更を `main` ブランチに反映する
+
+## フォント
+
+Google Fonts の書体（SIL Open Font License）を読み込んで使っています。
