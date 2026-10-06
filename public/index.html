@@ -2235,7 +2235,8 @@ function wireTools() {
 }
 /* 開いたとき: 前回の作りかけ（画像）と履歴を読み込む */
 async function resume(wanted) {
-  let list = null; try { list = await dbAll('projects'); } catch (e) {}
+  let list = null, same = true; // same: 画面の画像が、残してある作りかけと同じ（＝残し直さなくてよい）
+  try { list = await dbAll('projects'); } catch (e) {}
   if (list) {
     hist = list.filter(r => r && typeof r.id === 'string' && r.id[0] === 'h' && r.text).sort((a, b) => b.t - a.t).slice(0, HIST_MAX);
     const rec = list.find(r => r && r.id === 'draft');
@@ -2245,10 +2246,14 @@ async function resume(wanted) {
         setImages(rec, got); if (LAYOUTS[wanted].multi && multi()) S.layout = wanted;
         syncSel(); syncTune(); buildSwatches(); syncMats(); refresh();
         if (got.person || got.bg || got.extra.length) toolSay('前回の続きを開きました。' + (got.lost ? '一部の画像は残っていなかったので、入っていません。' : ''));
+        else if (got.lost) toolSay('前回入れた画像は、残っていなかったので入っていません。');
+        if (got.lost) same = false; // なくなった画像を指したままにしない
       }
     }
   }
-  ready = true; lastDraft = list ? JSON.stringify(imageRefs()) : ''; renderHist(); if (list) sweep(false);
+  if (epoch) same = false; // 読み込んでいる間に画像を入れたり、新しく作り直したりした: いまの画面のほうを残す
+  ready = true; lastDraft = list && same ? JSON.stringify(imageRefs()) : ''; renderHist(); if (list) sweep(false);
+  if (!same) touch();
 }
 
 /* ================= 保存 ================= */
