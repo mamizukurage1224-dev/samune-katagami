@@ -557,6 +557,7 @@ dialog.cut::backdrop{background:rgba(9,14,30,.58)}
       </div>
       <div class="cut-foot" id="cutFoot" hidden>
         <button type="button" class="btn primary" id="cutUse">この切り抜きを使う</button>
+        <button type="button" class="btn" id="cutSave">切り抜きだけ保存（PNG）</button>
         <button type="button" class="btn quiet" id="cutCancel">やめる</button>
         <span class="note" id="cutNote"></span>
       </div>
@@ -2328,17 +2329,17 @@ function cutShow(state) { // ask 確認 / load 読み込み中 / run 処理中 /
 async function openCut(P) {
   const box = $('#cutBox'); if (!P || CUT) return;
   CUT = {P, state: '', strokes: [], cur: null, mode: 'erase', zoom: 1, bg: cutBgPref, canRestore: true, usedAi: false, hover: null};
-  $('#cutTitle').textContent = cutLabel(P); cutSay(''); $('#cutCv').width = 16; $('#cutCv').height = 9;
+  $('#cutTitle').textContent = cutLabel(P); cutSay(''); $('#cutNote').textContent = ''; $('#cutNote').classList.remove('err'); $('#cutCv').width = 16; $('#cutCv').height = 9;
   try { box.showModal(); } catch (e) { box.setAttribute('open', ''); }
   if (P.cutout) { // 切り抜き済みの画像は、AIを使わずにブラシで直す
     const f = P.cutFrom;
-    if (f) cutEdit(f.orig, f.ai, f.mask, f.canRestore);
+    if (f) { CUT.full = f.full || null; cutEdit(f.orig, f.ai, f.mask, f.canRestore); }
     else { const s = splitAlpha(P.base); cutEdit(s.rgb, s.a, null, false); }
     return;
   }
   if (IN_CLAUDE) { cutShow('off'); const n = $('#cutMsg'); n.classList.remove('err'); n.textContent = 'Claude内のページでは、AIのデータを読み込めないため使えません。Web版で開くと使えます：'; const a = document.createElement('a'); a.className = 'cut-link'; a.href = WEB_URL; a.target = '_blank'; a.rel = 'noopener'; a.textContent = WEB_URL.replace(/^https:\/\/|\/$/g, ''); n.append(' ', a); return; }
   if (!aiCan()) { cutShow('off'); cutSay('このブラウザでは使えません。パソコンのChromeかEdgeで開いてください。', true); return; }
-  CUT.orig = workCopy(P.base);
+  CUT.orig = workCopy(P.base); CUT.full = P.base; // full: 保存用の元の大きさの画像
   if (aiReady || await aiCached()) { if (CUT && CUT.P === P) cutRun(); return; }
   if (!CUT || CUT.P !== P) return;
   $('#cutSize').textContent = AI_MB; cutShow('ask'); $('#cutGo').focus();
@@ -2435,14 +2436,46 @@ function cutClose() {
   if (box.open) { try { box.close(); } catch (e) { box.removeAttribute('open'); } }
   if (aiW) aiIdle();
 }
+function maskBox(mask) { // 透明でない部分の範囲
+  const w = mask.width, h = mask.height, d = mask.getContext('2d').getImageData(0, 0, w, h).data; let x0 = w, y0 = h, x1 = -1, y1 = -1;
+  for (let y = 0; y < h; y++) { const o = y * w * 4; for (let x = 0; x < w; x++) if (d[o + x * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
+  return x1 < 0 ? null : {x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1};
+}
+function cutPng() { // いまの切り抜きを、元の画像の大きさで、人物のまわりだけにした画像
+  const C = CUT, src = C.full && C.full.width > C.orig.width ? C.full : C.orig, k = src.width / C.mask.width, b = maskBox(C.mask);
+  if (!b) return null;
+  const x = Math.max(0, Math.floor(b.x * k) - 2), y = Math.max(0, Math.floor(b.y * k) - 2), w = Math.min(src.width - x, Math.ceil((b.x + b.w) * k) + 2 - x), h = Math.min(src.height - y, Math.ceil((b.y + b.h) * k) + 2 - y);
+  const out = mk(w, h), o = out.getContext('2d'); o.imageSmoothingQuality = 'high';
+  o.drawImage(src, x, y, w, h, 0, 0, w, h); o.globalCompositeOperation = 'destination-in'; o.drawImage(C.mask, x / k, y / k, w / k, h / k, 0, 0, w, h);
+  return out;
+}
+async function giveFile(blob, name, box) { // ファイルを渡す。戻り値: saved（保存した）/ declined（やめた）/ link（ダウンロードを始めた）
+  const dl = await dlReady;
+  if (dl) { try { await dl.save({filename: name, data: blob}); return 'saved'; } catch (e) { if (e && e.code === 'declined') return 'declined'; } }
+  const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; a.hidden = true;
+  (box || document.body).appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 60000); return 'link';
+}
+async function cutSave() {
+  const C = CUT; if (!C || C.state !== 'edit') return;
+  const btn = $('#cutSave'), note = $('#cutNote'), say = (t, bad) => { if (CUT !== C) return; note.textContent = t; note.classList.toggle('err', !!bad); };
+  btn.disabled = true; say('画像を作っています…');
+  try {
+    const c = cutPng(); if (!c) { say('人物が残っていないので、保存できません。', true); return; }
+    const blob = await toBlob(c, 'image/png'); if (!blob) throw new Error('blob');
+    const d = new Date(), p = n => String(n).padStart(2, '0'), name = `cutout-${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}.png`;
+    const r = await giveFile(blob, name, $('#cutBox'));
+    say(r === 'declined' ? '保存をやめました。' : `${r === 'saved' ? '保存しました' : '画像を用意しました'}（${name}、${c.width}×${c.height}、${Math.round(blob.size / 1024)}KB）`);
+  } catch (e) { say('画像を作れませんでした。もう一度押してください。', true); }
+  finally { btn.disabled = false; }
+}
 function cutApply() {
   const C = CUT; if (!C || C.state !== 'edit') return;
-  const out = mk(C.orig.width, C.orig.height), x = out.getContext('2d'); x.drawImage(C.orig, 0, 0); x.globalCompositeOperation = 'destination-in'; x.drawImage(C.mask, 0, 0);
-  if (!(analyze(out).box.w > 0)) { cutSay('人物が残っていません。「戻す」でなぞるか、「最初の状態に戻す」を押してください。', true); return; }
+  const out = cutPng(); // 元の画像の大きさで切り抜く（サムネでの画質のため）
+  if (!out || !(analyze(out).box.w > 0)) { cutSay('人物が残っていません。「戻す」でなぞるか、「最初の状態に戻す」を押してください。', true); return; }
   const P = C.P, at = S.person === P ? -1 : S.extra.indexOf(P);
   if (at === -1 && S.person !== P) { cutSay('この画像は、もう外されています。いったん閉じて、入れ直してください。', true); return; }
   const snap = snapshot(), was = multi();
-  const Q = prepPerson(out, true); Q.cutFrom = {orig: C.orig, ai: C.ai, mask: copyCanvas(C.mask), canRestore: C.canRestore};
+  const Q = prepPerson(out, true); Q.cutFrom = {orig: C.orig, ai: C.ai, mask: copyCanvas(C.mask), canRestore: C.canRestore, full: C.full || null};
   Q.adj.flip = !!(P.adj && P.adj.flip); // 左右反転だけは引き継ぐ（位置と大きさは、切り抜きに合わせて最初から）
   if (at === -1) { S.person = Q; S.sample = false; } else { S.extra[at] = Q; }
   keepSource(Q, Q.base, null); cutClose(); imgsChanged(was);
@@ -2455,7 +2488,7 @@ function wireCut() {
   $('#cutClose').addEventListener('click', cutClose); $('#cutNo').addEventListener('click', cutClose); $('#cutCancel').addEventListener('click', cutClose);
   box.addEventListener('cancel', e => { e.preventDefault(); cutClose(); }); // Esc
   box.addEventListener('close', () => { if (CUT) cutClose(); });
-  $('#cutGo').addEventListener('click', cutRun); $('#cutRetry').addEventListener('click', cutRun); $('#cutUse').addEventListener('click', cutApply);
+  $('#cutGo').addEventListener('click', cutRun); $('#cutRetry').addEventListener('click', cutRun); $('#cutUse').addEventListener('click', cutApply); $('#cutSave').addEventListener('click', cutSave);
   $('#cutUndo').addEventListener('click', () => { if (CUT && CUT.strokes.length) { CUT.strokes.pop(); cutRebuild(); } });
   $('#cutReset').addEventListener('click', () => { if (CUT && CUT.strokes.length) { CUT.strokes = []; cutRebuild(); } });
   $('#cutForget').addEventListener('click', async () => { aiStop(); try { await caches.delete(AI_CACHE); } catch (e) {} $('#cutForgetRow').hidden = true; cutSay('AIのデータを、このブラウザから消しました。次に使うときは、もう一度読み込みます。'); });
