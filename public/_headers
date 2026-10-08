@@ -1,0 +1,7 @@
+# ページ全体: 背景を消すAIを複数のCPUコアで速く動かすための設定（SharedArrayBuffer を使えるようにする）
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+# AIのデータは版ごとにフォルダを分けているので、長く保存してよい
+/ai/*
+  Cache-Control: public, max-age=31536000, immutable

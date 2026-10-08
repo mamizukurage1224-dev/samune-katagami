@@ -16,12 +16,14 @@ img{max-width:100%}
 const footCss = `
 .foot{display:grid;gap:2px;color:var(--ink-soft);font-size:12.5px;line-height:1.7;max-width:62em}
 .foot p{margin:0}
+.foot a{color:var(--accent);font-weight:700}
 `;
 const foot = `
   <footer class="foot">
     <p>入れた画像や動画は、このブラウザの中だけで処理します。外部には送信しません。</p>
-    <p>作りかけの画像・文字・設定と、お気に入り・履歴は、次に開いたときのために、このブラウザに保存されます。履歴は「履歴」からいつでも消せます。</p>
+    <p>作りかけの画像・文字・設定と、お気に入り・履歴は、次に開いたときのために、このブラウザに保存されます。履歴は「履歴」からいつでも消せます。背景を消すAIのデータ（約115MB）も、初めて使ったときにこのブラウザに保存され、「背景を消す」の画面から消せます。</p>
     <p>フォントは Google Fonts の書体（SIL Open Font License）を使っています。</p>
+    <p>背景を消すAIは、<a href="https://github.com/SkyTNT/anime-segmentation" target="_blank" rel="noopener">SkyTNT/anime-segmentation</a> の学習済みモデル（Apache License 2.0）を、読み込みを軽くするため形式を変えて使っています（<a href="ai/anime-seg-1/README.txt" target="_blank" rel="noopener">変えたところ</a>・<a href="ai/anime-seg-1/LICENSE.txt" target="_blank" rel="noopener">ライセンス</a>）。AIの実行には <a href="ai/ort-1.30.0/LICENSE.txt" target="_blank" rel="noopener">ONNX Runtime Web</a>（MIT License）を使っています。</p>
   </footer>
 `;
 const marker = '\n</div>\n\n<script>';
